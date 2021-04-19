@@ -1,0 +1,116 @@
+openapi: 3.0.2
+servers:
+  - url: /v1
+info:
+  description: |-
+    Conversation service handles orchestration of conversations at Dixa.
+  version: 0.0.1
+  title: Conversation Service - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+paths:
+  /conversation:
+    post:
+      summary: Add a new Conversation
+      operationId: addConversation
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Create a new Conversation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Conversation"
+  /conversation/${id}/message:
+    post:
+      summary: Add message to conversation
+      operationId: addMessageToConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of a Conversation associated with the message
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Add message to conversation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationMessage"
+components:
+  schemas:
+    Conversation:
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        user_id:
+          type: string
+          format: uuid
+          example: "1f61b753-9796-46fe-a9c7-ca1b58f09f97"
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        closed_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        initial_channel:
+          type: string
+          description: Channel that originated the Conversation
+          enum:
+            - widget
+            - telephony
+            - email
+            - whatsapp
+            - messenger
+          example: widget
+        status:
+          type: string
+          description: Status of a Conversation
+          enum:
+            - pending
+            - unassigned
+            - open
+            - closed
+          example: open
+        message:
+          type: string
+          description: Optional initial message in the conversation
+    ConversationMessage:
+      properties:
+        message:
+          type: string
+          description: Optional initial message in the conversation
+        direction:
+          type: string
+          description: Direction in which the message was sent
+          enum:
+            - inbound
+            - outbound
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+    ApiResponse:
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string

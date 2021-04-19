@@ -1,0 +1,70 @@
+openapi: 3.0.2
+servers:
+  - url: /v1
+info:
+  description: |-
+    Message service handles messages for conversations in Dixa.
+  version: 0.0.1
+  title: Messages Service - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+tags:
+  - name: messages
+    description: Everything about Messages of Conversations
+paths:
+  /messages:
+    post:
+      tags:
+        - messages
+      summary: Add a new Message
+      description: Add a new Message
+      operationId: addMessage
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Create a new Message
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+components:
+  schemas:
+    Message:
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        direction:
+          type: string
+          description: Direction in which the message was sent
+          enum:
+            - inbound
+            - outbound
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        initial_channel:
+          type: string
+          description: Channel that originated the Conversation
+          enum:
+            - widget
+            - telephony
+            - email
+            - whatsapp
+            - messenger
+          example: widget
+    ApiResponse:
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
