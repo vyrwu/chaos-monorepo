@@ -3,22 +3,28 @@
 generate_service () {
    DIR_NAME=$1
    GENERATOR_JAR=openapi-generator-cli-5.1.0.jar
-   GENERATOR_NAME='nodejs-express-server'
+   SERVER_GENERATOR='nodejs-express-server'
+   CLIENT_GENERATOR='typescript-axios'
 
-   rm -r ${DIR_NAME}/last_backup/*
-   mv ${DIR_NAME}/${GENERATOR_NAME} ${DIR_NAME}/last_backup
-   rm -rf ${DIR_NAME}/${GENERATOR_NAME}
+   rm -r ${DIR_NAME}/generated_backup/*
+   cp -r "${DIR_NAME}/generated/" "${DIR_NAME}/generated_backup/"
+
    java -jar ${GENERATOR_JAR} generate \
       -i ${DIR_NAME}/openapi.yaml \
-      -g ${GENERATOR_NAME} \
-      -o ${DIR_NAME}/${GENERATOR_NAME}
+      -g ${SERVER_GENERATOR} \
+      -o "${DIR_NAME}/generated/server"
+
+   java -jar ${GENERATOR_JAR} generate \
+      -i ${DIR_NAME}/openapi.yaml \
+      -g ${CLIENT_GENERATOR} \
+      -o "${DIR_NAME}/generated/client"
 }
 
 services=( 
    "conversation-service"
    "message-service"
-   # "offer-service"
    "queue-service"
+   # "offer-service"
    # "user-service"
 )
 

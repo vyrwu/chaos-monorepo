@@ -16,6 +16,10 @@ paths:
       responses:
         "200":
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Queues"
   /queue:
     post:
       summary: Add a new Queue
@@ -32,6 +36,23 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Queue"
+  /queue/{id}:
+    get:
+      summary: Get a single Queue
+      operationId: getQueue
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Queue in which to put the conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful Operation
+        "404":
+          description: Queue Not Found
   /queue/{id}/conversation:
     post:
       summary: Add a Conversation to the Queue
@@ -40,9 +61,10 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
+            type: string
           required: true
           description: ID of a Queue in which to put the conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
       responses:
         "200":
           description: Successful operation
@@ -60,10 +82,6 @@ components:
     Queue:
       properties:
         id:
-          type: integer
-          format: int64
-          example: 10
-        user_id:
           type: string
           format: uuid
           example: "f41b9796-a630-4d3e-9fd9-8be78373a48f"
@@ -76,17 +94,21 @@ components:
           description: Algorithm used to offer services
           enum:
             - oneAtATimeRandom
+    Queues:
+      type: array
+      items:
+        $ref: "#/components/schemas/Queue"
     QueuedConversation:
       description: A conversation to be offered.
       properties:
         id:
-          type: integer
-          format: int64
-          example: 10
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
         conversation_id:
-          type: integer
-          format: int64
-          example: 10
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
         isLive:
           type: boolean
           description: Whether the conversation has been offered to an agent already or not.
@@ -94,7 +116,7 @@ components:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z"
-        conversation_channel:
+        channel:
           type: string
           enum:
             - widget
