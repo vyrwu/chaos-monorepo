@@ -1,6 +1,6 @@
 openapi: 3.0.2
 servers:
-  - url: /v1
+  - url: http://conversation-service:8080/v1
 info:
   description: |-
     Conversation service handles orchestration of conversations at Dixa.
@@ -9,7 +9,37 @@ info:
   contact:
     email: ano@dixa.com
 paths:
-  /conversation:
+  /conversations:
+    get:
+      summary: Get all Conversations
+      operationId: getConversations
+      responses:
+        "200":
+          description: Successfuly operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversations"
+  /conversation/${id}:
+    get:
+      summary: Get a single conversation
+      operationId: getConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of a Conversation
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+        "404":
+          description: Conversation Not Found
     post:
       summary: Add a new Conversation
       operationId: addConversation
@@ -17,7 +47,7 @@ paths:
         "200":
           description: Successful operation
         "400":
-          description: Invalid input
+          description: Invalid inputs
       requestBody:
         description: Create a new Conversation
         required: true
@@ -105,12 +135,7 @@ components:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z"
-    ApiResponse:
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
-          type: string
-        message:
-          type: string
+    Conversations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Conversation"
