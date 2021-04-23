@@ -10,7 +10,6 @@ expressServer.js
 index.js
 logger.js
 package.json
-services/DefaultService.js
 services/MessagesService.js
 services/Service.js
 services/index.js

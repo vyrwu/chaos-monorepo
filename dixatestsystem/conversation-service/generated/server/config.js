@@ -3,7 +3,7 @@ const path = require('path');
 const config = {
   ROOT_DIR: __dirname,
   URL_PORT: 8080,
-  URL_PATH: 'http://conversation-service',
+  URL_PATH: 'http://localhost',
   BASE_VERSION: '/v1',
   CONTROLLER_DIRECTORY: path.join(__dirname, 'controllers'),
   PROJECT_DIR: __dirname,
