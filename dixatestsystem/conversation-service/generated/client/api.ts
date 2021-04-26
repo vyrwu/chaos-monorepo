@@ -133,7 +133,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addConversation: async (conversation: Conversation, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'conversation' is not null or undefined
             assertParamExists('addConversation', 'conversation', conversation)
-            const localVarPath = `/conversation/${id}`;
+            const localVarPath = `/conversation`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

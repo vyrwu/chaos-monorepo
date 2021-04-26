@@ -20,6 +20,23 @@ paths:
           description: Successfuly operation
       summary: Get all Conversations
       x-eov-operation-handler: controllers/DefaultController
+  /conversation:
+    post:
+      operationId: addConversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+        description: Create a new Conversation
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      summary: Add a new Conversation
+      x-eov-operation-handler: controllers/DefaultController
   /conversation/${id}:
     delete:
       operationId: deleteConversation
@@ -62,22 +79,6 @@ paths:
         "404":
           description: Conversation Not Found
       summary: Get a single Conversation
-      x-eov-operation-handler: controllers/DefaultController
-    post:
-      operationId: addConversation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Conversation'
-        description: Create a new Conversation
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-        "400":
-          description: Invalid inputs
-      summary: Add a new Conversation
       x-eov-operation-handler: controllers/DefaultController
   /conversation/${id}/message:
     post:
