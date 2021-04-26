@@ -1,0 +1,178 @@
+openapi: 3.0.2
+servers:
+  - url: /v1
+info:
+  description: |-
+    Conversation service handles orchestration of conversations at Dixa.
+  version: 0.0.1
+  title: Conversation Service - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+paths:
+  /conversations:
+    get:
+      summary: Get all Conversations
+      operationId: getConversations
+      responses:
+        "200":
+          description: Successfuly operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversations"
+  /conversation:
+    post:
+      summary: Add a new Conversation
+      operationId: addConversation
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      requestBody:
+        description: Create a new Conversation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Conversation"
+  /conversation/${id}:
+    get:
+      summary: Get a single Conversation
+      operationId: getConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+        "404":
+          description: Conversation Not Found
+    delete:
+      summary: Delete Conversation
+      operationId: deleteConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Conversation not found
+  /conversation/${id}/message:
+    post:
+      summary: Add message to conversation
+      operationId: addMessageToConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Conversation the message should be added to
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Add message to conversation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationMessage"
+  /conversation/${id}/messages:
+    get:
+      summary: Get all Messages in the Conversation
+      operationId: getMessagesInConversation
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Conversation the message should be added to
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationMessages"
+        "404":
+          description: Not Found
+components:
+  schemas:
+    Conversation:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        closed_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        channel:
+          type: string
+          description: Channel that originated the Conversation
+          enum:
+            - widget
+            - telephony
+            - email
+            - whatsapp
+            - messenger
+          example: widget
+        status:
+          type: string
+          description: Status of a Conversation
+          enum:
+            - pending
+            - unassigned
+            - open
+            - closed
+          example: open
+    ConversationMessage:
+      properties:
+        message:
+          type: string
+          description: Message to be added to the conversation
+        direction:
+          type: string
+          description: Direction in which the message was sent
+          enum:
+            - inbound
+            - outbound
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+    Conversations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Conversation"
+    ConversationMessages:
+      type: array
+      items:
+        $ref: "#/components/schemas/ConversationMessage"

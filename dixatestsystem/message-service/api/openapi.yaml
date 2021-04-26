@@ -1,0 +1,125 @@
+openapi: 3.0.2
+info:
+  contact:
+    email: ano@dixa.com
+  description: Message service handles messages for conversations in Dixa.
+  title: Messages Service - OpenAPI 3.0
+  version: 0.0.1
+servers:
+- url: http://localhost:8081/v1
+tags:
+- description: Everything about Messages of Conversations
+  name: messages
+paths:
+  /messages:
+    get:
+      operationId: getMessages
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Successfuly operation
+      summary: Get all Messages
+      x-eov-operation-handler: controllers/DefaultController
+  /message:
+    post:
+      description: Add a new Message
+      operationId: addMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+        description: Create a new Message
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid input
+      summary: Add a new Message
+      tags:
+      - messages
+      x-eov-operation-handler: controllers/MessagesController
+  /message/${id}:
+    delete:
+      operationId: deleteMessage
+      parameters:
+      - description: ID of a Message
+        example: e0064a57-b327-4f77-82d7-8042911613e8
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Message Not Found
+      summary: Delete a single Message
+      x-eov-operation-handler: controllers/DefaultController
+    get:
+      operationId: getMessage
+      parameters:
+      - description: ID of a Message
+        example: e0064a57-b327-4f77-82d7-8042911613e8
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Successful operation
+        "404":
+          description: Message Not Found
+      summary: Get a single message
+      x-eov-operation-handler: controllers/DefaultController
+components:
+  schemas:
+    Message:
+      example:
+        created_at: 2017-07-21T17:32:28Z
+        initial_channel: widget
+        id: afd75b5e-d323-40c6-a8e9-1557cbf8f5bb
+        direction: inbound
+      properties:
+        id:
+          example: afd75b5e-d323-40c6-a8e9-1557cbf8f5bb
+          format: uuid
+          type: string
+        direction:
+          description: Direction in which the message was sent
+          enum:
+          - inbound
+          - outbound
+          type: string
+        created_at:
+          example: 2017-07-21T17:32:28Z
+          format: date-time
+          type: string
+        initial_channel:
+          description: Channel that originated the Conversation
+          enum:
+          - widget
+          - telephony
+          - email
+          - whatsapp
+          - messenger
+          example: widget
+          type: string
+    Messages:
+      items:
+        $ref: '#/components/schemas/Message'
+      type: array

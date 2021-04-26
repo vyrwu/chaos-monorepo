@@ -3,3 +3,5 @@ generated_backup/
 node_modules/
 
 dist/
+
+*.tgz

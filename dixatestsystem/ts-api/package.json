@@ -1,0 +1,19 @@
+{
+  "name": "ts-api",
+  "version": "1.0.0",
+  "description": "TypeScript API consuming the REST API of Dixa Test System Microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "tsc",
+    "publish:file": "npm run prepublish && npm pack"
+  },
+  "author": "vyrwu",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}

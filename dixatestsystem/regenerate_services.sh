@@ -6,18 +6,18 @@ generate_service () {
    SERVER_GENERATOR='nodejs-express-server'
    CLIENT_GENERATOR='typescript-axios'
 
-   rm -r ${DIR_NAME}/generated_backup/*
-   cp -r "${DIR_NAME}/generated/" "${DIR_NAME}/generated_backup/"
+   rm -rf "backup/${DIR_NAME}"
+   cp -r "${DIR_NAME}" "backup/${DIR_NAME}"
 
    java -jar ${GENERATOR_JAR} generate \
       -i ${DIR_NAME}/openapi.yaml \
       -g ${SERVER_GENERATOR} \
-      -o "${DIR_NAME}/generated/server"
+      -o "${DIR_NAME}"
 
    java -jar ${GENERATOR_JAR} generate \
       -i ${DIR_NAME}/openapi.yaml \
       -g ${CLIENT_GENERATOR} \
-      -o "${DIR_NAME}/generated/client"
+      -o "ts-api/src/${DIR_NAME}"
 }
 
 services=( 

@@ -1,0 +1,126 @@
+openapi: 3.0.2
+servers:
+  - url: http://queue-service:8080/v1
+info:
+  description: |-
+    Queues the conversations to be handled by available agents.
+  version: 0.0.1
+  title: Queue Service - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+paths:
+  /queues:
+    get:
+      summary: Get all available Queues
+      operationId: getQueues
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Queues"
+  /queue:
+    post:
+      summary: Add a new Queue
+      operationId: addQueue
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Create a new Queue
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Queue"
+  /queue/{id}:
+    get:
+      summary: Get a single Queue
+      operationId: getQueue
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Queue in which to put the conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful Operation
+        "404":
+          description: Queue Not Found
+  /queue/{id}/conversation:
+    post:
+      summary: Add a Conversation to the Queue
+      operationId: addConversationToQueue
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Queue in which to put the conversation
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid input
+      requestBody:
+        description: Create a new Queue
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueuedConversation"
+components:
+  schemas:
+    Queue:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "f41b9796-a630-4d3e-9fd9-8be78373a48f"
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        offer_algorithm:
+          type: string
+          description: Algorithm used to offer services
+          enum:
+            - oneAtATimeRandom
+    Queues:
+      type: array
+      items:
+        $ref: "#/components/schemas/Queue"
+    QueuedConversation:
+      description: A conversation to be offered.
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        conversation_id:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        isLive:
+          type: boolean
+          description: Whether the conversation has been offered to an agent already or not.
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        channel:
+          type: string
+          enum:
+            - widget
+            - telephony
+            - email
+            - whatsapp
+            - messenger

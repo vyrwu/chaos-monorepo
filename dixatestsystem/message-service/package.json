@@ -1,7 +1,7 @@
 {
-  "name": "conversation-service-openapi-3-0",
+  "name": "messages-service-openapi-3-0",
   "version": "0.0.1",
-  "description": "Conversation service handles orchestration of conversations at Dixa.",
+  "description": "Message service handles messages for conversations in Dixa.",
   "main": "index.js",
   "scripts": {
     "prestart": "npm install",
@@ -24,7 +24,6 @@
     "ono": "^5.0.1",
     "openapi-sampler": "^1.0.0-beta.15",
     "swagger-ui-express": "^4.0.2",
-    "ts-api": "file:../ts-api/ts-api-1.0.0.tgz",
     "winston": "^3.2.1"
   },
   "devDependencies": {
