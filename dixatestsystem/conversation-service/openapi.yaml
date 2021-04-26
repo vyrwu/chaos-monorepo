@@ -20,6 +20,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Conversations"
+  /conversation:
+    post:
+      summary: Add a new Conversation
+      operationId: addConversation
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      requestBody:
+        description: Create a new Conversation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Conversation"
   /conversation/${id}:
     get:
       summary: Get a single Conversation
@@ -41,21 +57,6 @@ paths:
                 $ref: "#/components/schemas/Conversation"
         "404":
           description: Conversation Not Found
-    post:
-      summary: Add a new Conversation
-      operationId: addConversation
-      responses:
-        "200":
-          description: Successful operation
-        "400":
-          description: Invalid inputs
-      requestBody:
-        description: Create a new Conversation
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Conversation"
     delete:
       summary: Delete Conversation
       operationId: deleteConversation
