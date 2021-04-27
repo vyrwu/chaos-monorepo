@@ -8,7 +8,4 @@ controllers/index.js
 expressServer.js
 index.js
 logger.js
-services/DefaultService.js
-services/Service.js
-services/index.js
 utils/openapiRouter.js
