@@ -7,7 +7,7 @@ const MessageServiceClient = new MessageService.DefaultApi();
 
 AWS.config.update({ region: 'eu-west-1' });
 
-const DynamoDBClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+const DynamoDBClient = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 
 const DynamoDBTableName = 'chaos-secalekdev-conversations';
 
@@ -18,6 +18,13 @@ const DynamoDBTableName = 'chaos-secalekdev-conversations';
 * no response value expected for this operation
 * */
 const addConversation = async ({ conversation }) => {
+  DynamoDBClient.listTables({Limit: 10}, (err, data) => {
+    if (err) {
+      console.log("Error", err.code);
+    } else {
+      console.log("Table names are ", data.TableNames);
+    }
+  });
   // add convo to DB
   // add message
   // add convo to queue
