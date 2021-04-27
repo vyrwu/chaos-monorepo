@@ -60,8 +60,6 @@ do
    cd "${i}"
    npm update
    npm audit fix
-   cd "deploy"
-   AWS_PROFILE=security bash deploy.sh ${npm_token}
 done
 
 echo ""
