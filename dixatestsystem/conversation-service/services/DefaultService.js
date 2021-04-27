@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const { MessageService } = require('ts-api');
+const { MessageService } = require('@vyrwu/ts-api');
 const AWS = require('aws-sdk');
 const Service = require('./Service');
 

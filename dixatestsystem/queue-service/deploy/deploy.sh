@@ -34,5 +34,5 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-buildAndDeploy "conversation-service" "${npm_token}"
+buildAndDeploy "queue-service" "${npm_token}"
 
