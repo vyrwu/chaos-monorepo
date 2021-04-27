@@ -59,7 +59,6 @@ do
    echo ""
    cd "${i}"
    npm update
-   npm audit fix
 done
 
 echo ""
