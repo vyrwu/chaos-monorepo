@@ -1,8 +1,15 @@
 /* eslint-disable no-unused-vars */
 const { MessageService } = require('ts-api');
+const AWS = require('aws-sdk');
 const Service = require('./Service');
 
-const api = new MessageService.DefaultApi();
+const MessageServiceClient = new MessageService.DefaultApi();
+
+AWS.config.update({ region: 'eu-west-1' });
+
+const DynamoDBClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+
+const DynamoDBTableName = 'chaos-secalekdev-conversations';
 
 /**
 * Add a new Conversation
@@ -11,10 +18,9 @@ const api = new MessageService.DefaultApi();
 * no response value expected for this operation
 * */
 const addConversation = async ({ conversation }) => {
-  console.log('pre')
-  const response = await api.getMessages();
-  console.log(response);
-  console.log('post')
+  // add convo to DB
+  // add message
+  // add convo to queue
   return new Promise(
     async (resolve, reject) => {
       try {
