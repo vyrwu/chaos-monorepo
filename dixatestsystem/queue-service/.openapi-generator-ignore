@@ -25,3 +25,7 @@
 services/*.js
 package.json
 Dockerfile
+deploy/**/*
+config.js
+logger.js
+.eslintrc.json

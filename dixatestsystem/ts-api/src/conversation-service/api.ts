@@ -172,7 +172,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('addMessageToConversation', 'id', id)
             // verify required parameter 'conversationMessage' is not null or undefined
             assertParamExists('addMessageToConversation', 'conversationMessage', conversationMessage)
-            const localVarPath = `/conversation/${id}/message`
+            const localVarPath = `/conversation/{id}/message`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -209,7 +209,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteConversation: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteConversation', 'id', id)
-            const localVarPath = `/conversation/${id}`
+            const localVarPath = `/conversation/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -243,7 +243,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getConversation: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getConversation', 'id', id)
-            const localVarPath = `/conversation/${id}`
+            const localVarPath = `/conversation/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -307,7 +307,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getMessagesInConversation: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getMessagesInConversation', 'id', id)
-            const localVarPath = `/conversation/${id}/messages`
+            const localVarPath = `/conversation/{id}/messages`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

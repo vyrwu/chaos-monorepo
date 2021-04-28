@@ -36,7 +36,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Conversation"
-  /conversation/${id}:
+  /conversation/{id}:
     get:
       summary: Get a single Conversation
       operationId: getConversation
@@ -45,6 +45,7 @@ paths:
           name: id
           schema:
             type: string
+            format: uuid
           required: true
           description: ID of a Conversation
           example: "e0064a57-b327-4f77-82d7-8042911613e8"
@@ -73,7 +74,7 @@ paths:
           description: Successful operation
         "404":
           description: Conversation not found
-  /conversation/${id}/message:
+  /conversation/{id}/message:
     post:
       summary: Add message to conversation
       operationId: addMessageToConversation
@@ -97,7 +98,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ConversationMessage"
-  /conversation/${id}/messages:
+  /conversation/{id}/messages:
     get:
       summary: Get all Messages in the Conversation
       operationId: getMessagesInConversation

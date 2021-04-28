@@ -8,6 +8,10 @@
 
 const Controller = require('./Controller');
 const service = require('../services/DefaultService');
+const addMessage = async (request, response) => {
+  await Controller.handleRequest(request, response, service.addMessage);
+};
+
 const deleteMessage = async (request, response) => {
   await Controller.handleRequest(request, response, service.deleteMessage);
 };
@@ -22,6 +26,7 @@ const getMessages = async (request, response) => {
 
 
 module.exports = {
+  addMessage,
   deleteMessage,
   getMessage,
   getMessages,

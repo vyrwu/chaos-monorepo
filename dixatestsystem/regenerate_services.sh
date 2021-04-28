@@ -27,7 +27,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-services=( 
+services_to_generate=( 
    "conversation-service"
    "message-service"
    "queue-service"
@@ -35,7 +35,7 @@ services=(
    # "user-service"
 )
 
-for i in "${services[@]}"
+for i in "${services_to_generate[@]}"
 do
    echo ""
    echo "REGENERATING $i"
@@ -53,7 +53,15 @@ npm i
 npm publish
 cd ..
 
-for i in "${services[@]}"
+services_to_update=( 
+   "conversation-service"
+   "message-service"
+   "queue-service"
+   # "offer-service"
+   # "user-service"
+)
+
+for i in "${services_to_update[@]}"
 do
    echo ""
    echo "UPGRADING CLIENT LIBS: $i"

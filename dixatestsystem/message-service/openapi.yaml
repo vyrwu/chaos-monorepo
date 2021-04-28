@@ -8,9 +8,6 @@ info:
   title: Messages Service - OpenAPI 3.0
   contact:
     email: ano@dixa.com
-tags:
-  - name: messages
-    description: Everything about Messages of Conversations
 paths:
   /messages:
     get:
@@ -25,8 +22,6 @@ paths:
                 $ref: "#/components/schemas/Messages"
   /message:
     post:
-      tags:
-        - messages
       summary: Add a new Message
       description: Add a new Message
       operationId: addMessage
@@ -42,7 +37,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Message"
-  /message/${id}:
+  /message/{id}:
     get:
       summary: Get a single message
       operationId: getMessage

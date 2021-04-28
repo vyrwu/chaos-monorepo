@@ -81,6 +81,42 @@ export enum MessageInitialChannelEnum {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Add a new Message
+         * @summary Add a new Message
+         * @param {Message} message Create a new Message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addMessage: async (message: Message, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'message' is not null or undefined
+            assertParamExists('addMessage', 'message', message)
+            const localVarPath = `/message`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(message, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Delete a single Message
          * @param {string} id ID of a Message
@@ -90,7 +126,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteMessage: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteMessage', 'id', id)
-            const localVarPath = `/message/${id}`
+            const localVarPath = `/message/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -124,7 +160,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getMessage: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getMessage', 'id', id)
-            const localVarPath = `/message/${id}`
+            const localVarPath = `/message/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -189,6 +225,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
+         * Add a new Message
+         * @summary Add a new Message
+         * @param {Message} message Create a new Message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addMessage(message: Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addMessage(message, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @summary Delete a single Message
          * @param {string} id ID of a Message
@@ -231,6 +278,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
+         * Add a new Message
+         * @summary Add a new Message
+         * @param {Message} message Create a new Message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addMessage(message: Message, options?: any): AxiosPromise<void> {
+            return localVarFp.addMessage(message, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Delete a single Message
          * @param {string} id ID of a Message
@@ -270,6 +327,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
+     * Add a new Message
+     * @summary Add a new Message
+     * @param {Message} message Create a new Message
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public addMessage(message: Message, options?: any) {
+        return DefaultApiFp(this.configuration).addMessage(message, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Delete a single Message
      * @param {string} id ID of a Message
@@ -302,113 +371,6 @@ export class DefaultApi extends BaseAPI {
      */
     public getMessages(options?: any) {
         return DefaultApiFp(this.configuration).getMessages(options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * MessagesApi - axios parameter creator
- * @export
- */
-export const MessagesApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * Add a new Message
-         * @summary Add a new Message
-         * @param {Message} message Create a new Message
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        addMessage: async (message: Message, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'message' is not null or undefined
-            assertParamExists('addMessage', 'message', message)
-            const localVarPath = `/message`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(message, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * MessagesApi - functional programming interface
- * @export
- */
-export const MessagesApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = MessagesApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * Add a new Message
-         * @summary Add a new Message
-         * @param {Message} message Create a new Message
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async addMessage(message: Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.addMessage(message, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * MessagesApi - factory interface
- * @export
- */
-export const MessagesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = MessagesApiFp(configuration)
-    return {
-        /**
-         * Add a new Message
-         * @summary Add a new Message
-         * @param {Message} message Create a new Message
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        addMessage(message: Message, options?: any): AxiosPromise<void> {
-            return localVarFp.addMessage(message, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * MessagesApi - object-oriented interface
- * @export
- * @class MessagesApi
- * @extends {BaseAPI}
- */
-export class MessagesApi extends BaseAPI {
-    /**
-     * Add a new Message
-     * @summary Add a new Message
-     * @param {Message} message Create a new Message
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MessagesApi
-     */
-    public addMessage(message: Message, options?: any) {
-        return MessagesApiFp(this.configuration).addMessage(message, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

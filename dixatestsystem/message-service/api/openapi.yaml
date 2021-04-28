@@ -7,9 +7,6 @@ info:
   version: 0.0.1
 servers:
 - url: http://message-service/v1
-tags:
-- description: Everything about Messages of Conversations
-  name: messages
 paths:
   /messages:
     get:
@@ -40,10 +37,8 @@ paths:
         "400":
           description: Invalid input
       summary: Add a new Message
-      tags:
-      - messages
-      x-eov-operation-handler: controllers/MessagesController
-  /message/${id}:
+      x-eov-operation-handler: controllers/DefaultController
+  /message/{id}:
     delete:
       operationId: deleteMessage
       parameters:

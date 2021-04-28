@@ -37,7 +37,7 @@ paths:
           description: Invalid inputs
       summary: Add a new Conversation
       x-eov-operation-handler: controllers/DefaultController
-  /conversation/${id}:
+  /conversation/{id}:
     delete:
       operationId: deleteConversation
       parameters:
@@ -67,6 +67,7 @@ paths:
         name: id
         required: true
         schema:
+          format: uuid
           type: string
         style: simple
       responses:
@@ -80,7 +81,7 @@ paths:
           description: Conversation Not Found
       summary: Get a single Conversation
       x-eov-operation-handler: controllers/DefaultController
-  /conversation/${id}/message:
+  /conversation/{id}/message:
     post:
       operationId: addMessageToConversation
       parameters:
@@ -107,7 +108,7 @@ paths:
           description: Invalid input
       summary: Add message to conversation
       x-eov-operation-handler: controllers/DefaultController
-  /conversation/${id}/messages:
+  /conversation/{id}/messages:
     get:
       operationId: getMessagesInConversation
       parameters:
