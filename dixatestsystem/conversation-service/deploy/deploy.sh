@@ -20,7 +20,7 @@ buildAndDeploy() {
     git_sha=$(git rev-parse HEAD)
     image_name="654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-${service_name}"
 
-    docker build -t "${image_name}" --build-arg NPM_TOKEN="${npm_token}" ../.
+    docker build -t "${image_name}" --build-arg NPM_TOKEN="${npm_token}" --no-cache ../.
     docker build -t "${image_name}":latest -t "${image_name}:${git_sha}" -f ../Dockerfile --build-arg NPM_TOKEN="${npm_token}" ../.
 
     docker push "${image_name}":latest

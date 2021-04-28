@@ -49,6 +49,7 @@ echo ""
 
 cd "ts-api"
 npm version minor > /dev/null
+npm i
 npm publish
 cd ..
 

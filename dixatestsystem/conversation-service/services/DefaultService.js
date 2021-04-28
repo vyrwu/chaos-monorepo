@@ -25,7 +25,14 @@ const addConversation = async ({ conversation }) => {
   //     console.log("Table names are ", data.TableNames);
   //   }
   // });
-  console.log(`Contacting messages: ${(await MessageServiceClient.getMessages()).data}`);
+  console.log('addConversation')
+  Promise.resolve(MessageServiceClient.getMessages())
+    .then(data => {
+      console.log(data)
+    })
+    .catch(err => {
+      console.log(err)
+    })
   // add convo to DB
   // add message
   // add convo to queue
