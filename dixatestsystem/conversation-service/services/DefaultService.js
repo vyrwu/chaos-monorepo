@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-const { MessageService } = require('@vyrwu/ts-api');
+const { MessageService, QueueService } = require('@vyrwu/ts-api');
 const AWS = require('aws-sdk');
 const Service = require('./Service');
 const logger = require('../logger')
 
 const MessageServiceClient = new MessageService.DefaultApi();
+const QueueServiceClient = new QueueService.DefaultApi();
 
 const ConversationsDao = (() => {
   // AWS.config.update({ region: 'eu-west-1' });
@@ -56,12 +57,33 @@ const addConversation = async ({ conversation }) => new Promise(
   async (resolve, reject) => {
     try {
       logger.info(`addConversation: ${JSON.stringify(conversation)}`)
+      // add conversation
       const { badRequest } = ConversationsDao.Responses
-      if (ConversationsDao.writeConversation(conversation) === badRequest) {
+      const newConversation = {
+        id: uuidv4(),
+        created_at: Date.now(),
+        ...conversation
+      }
+      if (ConversationsDao.writeConversation(newConversation) === badRequest) {
         throw { message: `Conversation with ID '${conversation.id}' already exists`, code: 400 }
       }
+      // optionally add message
+      if (conversation.message) {
+        Promise.resolve(MessageServiceClient.addMessage({
+          initial_channel: conversation.channel,
+          direction: 'inbound'
+        }))
+          .then(res => { console.log(res) })
+          .catch(err => {
+          console.log(JSON.stringify(err))
+          throw { message: 'Error adding message', code: 500 }
+        })
+      }
+      // add Conversation to Queue
+      Promise.resolve(QueueServiceClient)
+
       resolve(Service.successResponse({
-        conversation,
+        newConversation,
       }));
     } catch (e) {
       reject(Service.rejectResponse(

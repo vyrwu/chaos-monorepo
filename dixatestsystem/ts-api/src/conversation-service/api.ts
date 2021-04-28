@@ -57,6 +57,12 @@ export interface Conversation {
      * @memberof Conversation
      */
     status?: ConversationStatusEnum;
+    /**
+     * Optional first message associated with the conversation
+     * @type {string}
+     * @memberof Conversation
+     */
+    message?: string;
 }
 
 /**

@@ -154,6 +154,9 @@ components:
             - open
             - closed
           example: open
+        message:
+          type: string
+          description: Optional first message associated with the conversation
     ConversationMessage:
       properties:
         message:
