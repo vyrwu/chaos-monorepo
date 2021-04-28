@@ -3,14 +3,14 @@
 buildAndDeploy() {
     service_name=$1
     if [ -z "$1" ]; then
-        echo "missing arg: [service_name]"
+        echo "missing arg: [service_name] [npm_token]"
         echo "usage: buildAndDeploy [service_name] [npm_token]"
         exit 1
     fi
 
     npm_token=$2
     if [ -z "$2" ]; then
-        echo "missing arg: [npm_token]"
+        echo "missing arg: [service_name] [npm_token]"
         echo "usage: buildAndDeploy [service_name] [npm_token]"
         exit 1
     fi

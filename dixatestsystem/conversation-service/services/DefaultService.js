@@ -18,13 +18,14 @@ const DynamoDBTableName = 'chaos-secalekdev-conversations';
 * no response value expected for this operation
 * */
 const addConversation = async ({ conversation }) => {
-  DynamoDBClient.listTables({Limit: 10}, (err, data) => {
-    if (err) {
-      console.log("Error", err.code);
-    } else {
-      console.log("Table names are ", data.TableNames);
-    }
-  });
+  // DynamoDBClient.listTables({Limit: 10}, (err, data) => {
+  //   if (err) {
+  //     console.log("Error", err.code);
+  //   } else {
+  //     console.log("Table names are ", data.TableNames);
+  //   }
+  // });
+  console.log(`Contacting messages: ${(await MessageServiceClient.getMessages()).data}`);
   // add convo to DB
   // add message
   // add convo to queue

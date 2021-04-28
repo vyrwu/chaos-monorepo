@@ -4,7 +4,7 @@ metadata:
   name: message-service
 spec:
   selector:
-    name: message-service
+    dixa-app: message-service
   ports:
     - port: 80
       targetPort: 8080

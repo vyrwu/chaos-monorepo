@@ -4,7 +4,7 @@ metadata:
   name: conversation-service
 spec:
   selector:
-    name: conversation-service
+    dixa-app: conversation-service
   ports:
     - port: 80
       targetPort: 8080
