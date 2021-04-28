@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-service
+  labels:
+    dixa-app: message-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dixa-app: message-service 
+  template:
+    metadata:
+      name: message-service
+      labels:
+        dixa-app: message-service
+    spec:
+      containers:
+      - name: message-service
+        image: 654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-message-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /hello
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 250m
+          limits:
+            memory: 256Mi
+            cpu: 1000m

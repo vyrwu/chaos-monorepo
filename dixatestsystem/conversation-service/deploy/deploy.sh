@@ -36,3 +36,5 @@ fi
 
 buildAndDeploy "conversation-service" "${npm_token}"
 
+# kick the deployment to re-pull image
+kubectl patch deployment conversation-service -n default -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
