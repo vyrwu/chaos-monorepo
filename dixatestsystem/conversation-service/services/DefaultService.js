@@ -2,14 +2,49 @@
 const { MessageService } = require('@vyrwu/ts-api');
 const AWS = require('aws-sdk');
 const Service = require('./Service');
+const logger = require('../logger')
 
 const MessageServiceClient = new MessageService.DefaultApi();
 
-AWS.config.update({ region: 'eu-west-1' });
+const ConversationsDao = (() => {
+  // AWS.config.update({ region: 'eu-west-1' });
+  // const DynamoDBClient = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
+  // const DynamoDBTableName = 'chaos-secalekdev-conversations';
 
-const DynamoDBClient = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
+  let conversations = []
 
-const DynamoDBTableName = 'chaos-secalekdev-conversations';
+  const Responses = {
+    notFound: 'Not Found',
+    ok: 'OK',
+    badRequest: 'Bad Request',
+  }
+
+  logger.info('In memory Conversation DAO started!\n')
+
+  return {
+    Responses,
+    listConversations: () => ([...conversations]),
+    readConversationById: (id) => (
+      conversations.find(conversation => conversation.id === id) || Responses.notFound
+    ),
+    writeConversation: (newConversation) => {
+      const exists = conversations.find(conversation => conversation.id === newConversation.id)
+      if (exists) {
+        return Responses.badRequest
+      }
+      conversations = [...conversations, newConversation]
+      return Responses.ok
+    },
+    deleteConversationById: (id) => {
+      const i = conversations.findIndex(conversation => conversation.id === id)
+      if (i === -1) {
+        return Responses.notFound
+      }
+      conversations.splice(i, 1)
+      return Responses.ok
+    },
+  }
+})()
 
 /**
 * Add a new Conversation
@@ -17,40 +52,25 @@ const DynamoDBTableName = 'chaos-secalekdev-conversations';
 * conversation Conversation Create a new Conversation
 * no response value expected for this operation
 * */
-const addConversation = async ({ conversation }) => {
-  // DynamoDBClient.listTables({Limit: 10}, (err, data) => {
-  //   if (err) {
-  //     console.log("Error", err.code);
-  //   } else {
-  //     console.log("Table names are ", data.TableNames);
-  //   }
-  // });
-  console.log('addConversation')
-  Promise.resolve(MessageServiceClient.getMessages())
-    .then(data => {
-      console.log(data)
-    })
-    .catch(err => {
-      console.log(err)
-    })
-  // add convo to DB
-  // add message
-  // add convo to queue
-  return new Promise(
-    async (resolve, reject) => {
-      try {
-        resolve(Service.successResponse({
-          conversation,
-        }));
-      } catch (e) {
-        reject(Service.rejectResponse(
-          e.message || 'Invalid input',
-          e.status || 405,
-        ));
+const addConversation = async ({ conversation }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      logger.info(`addConversation: ${JSON.stringify(conversation)}`)
+      const { badRequest } = ConversationsDao.Responses
+      if (ConversationsDao.writeConversation(conversation) === badRequest) {
+        throw { message: `Conversation with ID '${conversation.id}' already exists`, code: 400 }
       }
-    },
-  )
-};
+      resolve(Service.successResponse({
+        conversation,
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Invalid input',
+        e.status || 405,
+      ));
+    }
+  },
+);
 /**
 * Add message to conversation
 *
@@ -61,6 +81,12 @@ const addConversation = async ({ conversation }) => {
 const addMessageToConversation = ({ id, conversationMessage }) => new Promise(
   async (resolve, reject) => {
     try {
+      logger.info(`addMessageToConversation: ${JSON.stringify({ id, conversationMessage })}`)
+      const { notFound } = ConversationsDao.Responses
+      if (ConversationsDao.readConversationById(id) === notFound) {
+        throw { message: `Conversation of ID '${id}' not found.`, code: 404 }
+      }
+      // MessageServiceClient.addMessage({ conversationId: id, ...conversationMessage })
       resolve(Service.successResponse({
         id,
         conversationMessage,
@@ -82,6 +108,11 @@ const addMessageToConversation = ({ id, conversationMessage }) => new Promise(
 const deleteConversation = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
+      logger.info(`deleteConversation: ${JSON.stringify({ id })}`)
+      const { notFound } = ConversationsDao.Responses
+      if (ConversationsDao.deleteConversationById(id) === notFound) {
+        throw { message: `Conversation of ID '${id}' not found.`, code: 404 }
+      }
       resolve(Service.successResponse({
         id,
       }));
@@ -102,8 +133,14 @@ const deleteConversation = ({ id }) => new Promise(
 const getConversation = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
+      logger.info(`getConversation: ${JSON.stringify({ id })}`)
+      const { notFound } = ConversationsDao.Responses
+      const target = ConversationsDao.readConversationById(id)
+      if (target === notFound) {
+        throw { message: `Conversation of ID '${id}' not found.`, code: 404 }
+      }
       resolve(Service.successResponse({
-        id,
+        ...target,
       }));
     } catch (e) {
       reject(Service.rejectResponse(
@@ -121,7 +158,10 @@ const getConversation = ({ id }) => new Promise(
 const getConversations = () => new Promise(
   async (resolve, reject) => {
     try {
+      logger.info('getConversations: {}')
+      const conversations = ConversationsDao.listConversations()
       resolve(Service.successResponse({
+        conversations,
       }));
     } catch (e) {
       reject(Service.rejectResponse(

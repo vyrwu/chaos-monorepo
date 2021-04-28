@@ -7,3 +7,119 @@
 {"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-26T22:12:34.766Z"}
 {"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-26T22:17:01.569Z"}
 {"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-26T22:17:19.966Z"}
+{"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-28T14:11:41.369Z"}
+{"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-28T14:18:06.815Z"}
+{"message":"In memory Conversation DAO started!","level":"info","service":"user-service","timestamp":"2021-04-28T14:18:07.122Z"}
+{"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-28T14:18:29.546Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"user-service","timestamp":"2021-04-28T14:18:29.833Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:19:18.555Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:19:18.840Z"}
+{"message":"addConversation: [object Object]","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:21:22.228Z"}
+{"message":"addConversation: [object Object]","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:21:46.737Z"}
+{"message":"addConversation: [object Object]","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:22:42.543Z"}
+{"message":"addConversation: [object Object]","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:22:59.140Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:23:41.125Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:24:12.646Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:24:12.989Z"}
+{"level":"info","message":"","timestamp":"2021-04-28T14:24:14.694Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:25:55.077Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:25:55.306Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:26:32.210Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:26:32.439Z"}
+{"message":"addConversation: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:27:05.598Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:27:20.752Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:28.842Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:29.134Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:30.085Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:32.792Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:36.575Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:32:37.508Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:31.595Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:31.848Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:32.542Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:33.417Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:34.797Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:35.323Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:35.621Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:33:36.272Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:25.075Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:25.307Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:27.654Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:30.114Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:31.314Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:59.338Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:34:59.620Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:01.831Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:02.891Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:03.732Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:38.709Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:39.022Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:39.784Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:35:40.906Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:31.519Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:31.751Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:32.601Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:39.717Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:39.947Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:36:42.864Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:38.321Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:44.198Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:44.433Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:45.707Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:46.989Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:51.155Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:37:56.186Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:27.092Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:27.380Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:32.949Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:34.510Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:35.377Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:38.309Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:54.793Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:55.033Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:39:58.958Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:40:07.525Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:40:09.322Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:40:20.621Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:40:20.869Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T14:40:22.179Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T15:00:53.159Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T15:04:05.414Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T15:06:33.003Z"}
+{"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-28T16:44:57.829Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"user-service","timestamp":"2021-04-28T16:44:58.131Z"}
+{"message":"addConversation: {\"id\":\"485b3fed-c82e-470e-bf0b-d15d30d9c0c3\"}","level":"info","service":"user-service","timestamp":"2021-04-28T16:45:39.274Z"}
+{"message":"Express server running","level":"info","service":"user-service","timestamp":"2021-04-28T16:48:26.352Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"user-service","timestamp":"2021-04-28T16:48:26.693Z"}
+{"message":"addConversation: {\"id\":1}","level":"info","service":"user-service","timestamp":"2021-04-28T16:48:49.996Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T16:59:25.239Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T16:59:25.574Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T16:59:51.133Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:00:04.650Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:10.507Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:10.516Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:10.534Z"}
+{"message":"deleteConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:10.550Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:10.565Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:25.721Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:25.731Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:25.740Z"}
+{"message":"deleteConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:25.755Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:04:25.766Z"}
+{"message":"Express server running","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:04.183Z"}
+{"message":"In memory Conversation DAO started!\n","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:04.505Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:06.448Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:06.464Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:06.477Z"}
+{"message":"deleteConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:06.490Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:06.505Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:50.027Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:50.035Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:50.044Z"}
+{"message":"deleteConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:50.055Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:06:50.067Z"}
+{"message":"addConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:07:10.488Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:07:10.496Z"}
+{"message":"getConversations: {}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:07:10.505Z"}
+{"message":"deleteConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:07:10.516Z"}
+{"message":"getConversation: {\"id\":\"6866c090-44f0-446b-9ec8-b52e3be4bf15\"}","level":"info","service":"conversation-service","timestamp":"2021-04-28T17:07:10.530Z"}
