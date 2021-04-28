@@ -1,6 +1,6 @@
 openapi: 3.0.2
 servers:
-  - url: /v1
+  - url: http://conversation-service/v1
 info:
   description: |-
     Conversation service handles orchestration of conversations at Dixa.

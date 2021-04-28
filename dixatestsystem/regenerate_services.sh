@@ -29,8 +29,8 @@ fi
 
 services=( 
    "conversation-service"
-   # "message-service"
-   # "queue-service"
+   "message-service"
+   "queue-service"
    # "offer-service"
    # "user-service"
 )
@@ -48,7 +48,7 @@ echo "UPDATING CLIENT PACKAGE"
 echo ""
 
 cd "ts-api"
-npm version minor
+npm version minor > /dev/null
 npm publish
 cd ..
 
@@ -59,6 +59,7 @@ do
    echo ""
    cd "${i}"
    npm update
+   cd ..
 done
 
 echo ""

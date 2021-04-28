@@ -1,6 +1,6 @@
 openapi: 3.0.2
 servers:
-  - url: http://localhost:8081/v1
+  - url: http://message-service/v1
 info:
   description: |-
     Message service handles messages for conversations in Dixa.

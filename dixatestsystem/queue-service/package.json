@@ -1,5 +1,5 @@
 {
-  "name":  "queue-service-openapi-3-0",
+  "name": "queue-service-openapi-3-0",
   "version": "0.0.1",
   "description": "Queues the conversations to be handled by available agents.",
   "main": "index.js",

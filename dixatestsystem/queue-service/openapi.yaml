@@ -1,6 +1,6 @@
 openapi: 3.0.2
 servers:
-  - url: http://queue-service:8080/v1
+  - url: http://queue-service/v1
 info:
   description: |-
     Queues the conversations to be handled by available agents.

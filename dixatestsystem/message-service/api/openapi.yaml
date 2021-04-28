@@ -6,7 +6,7 @@ info:
   title: Messages Service - OpenAPI 3.0
   version: 0.0.1
 servers:
-- url: http://localhost:8081/v1
+- url: http://message-service/v1
 tags:
 - description: Everything about Messages of Conversations
   name: messages
