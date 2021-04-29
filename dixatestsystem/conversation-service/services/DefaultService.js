@@ -3,6 +3,7 @@ const { MessageService, QueueService } = require('@vyrwu/ts-api');
 const AWS = require('aws-sdk');
 const Service = require('./Service');
 const logger = require('../logger')
+const { v4: uuidv4 } = require('uuid')
 
 const MessageServiceClient = new MessageService.DefaultApi();
 const QueueServiceClient = new QueueService.DefaultApi();
@@ -67,21 +68,46 @@ const addConversation = async ({ conversation }) => new Promise(
       if (ConversationsDao.writeConversation(newConversation) === badRequest) {
         throw { message: `Conversation with ID '${conversation.id}' already exists`, code: 400 }
       }
-      // optionally add message
-      if (conversation.message) {
-        Promise.resolve(MessageServiceClient.addMessage({
-          initial_channel: conversation.channel,
-          direction: 'inbound'
-        }))
-          .then(res => { console.log(res) })
-          .catch(err => {
-          console.log(JSON.stringify(err))
-          throw { message: 'Error adding message', code: 500 }
+      // addMessage
+      Promise.resolve(MessageServiceClient.addMessage({
+        initial_channel: conversation.channel,
+        direction: 'inbound'
+      }))
+        .then(res => { console.log(res) })
+        .catch(err => {
+        console.log(JSON.stringify(err))
+        throw { message: 'Error adding message', code: 500 }
         })
+      // addConversationToForcedQueue
+      const targetQueue = conversation.channel
+      try {
+        const queuedConversation = {
+          channel: newConversation.channel,
+          conversation_id: newConversation.id,
+          isLive: true,
+        }
+        const getQueueResponse = await QueueServiceClient.getQueue(targetQueue)
+        if (![200, 404].includes(getQueueResponse.status)) {
+          throw { message: 'Unexpected error when fetching queue from Queue Service', code: 500 }
+        }
+        if (getQueueResponse.status === 404) {
+          const addQueueResponse = await QueueServiceClient.addQueue({ name: targetQueue, offer_algorithm: 'oneAtATimeRandom' })
+          if (addQueueResponse.status !== 200) {
+            throw { message: 'Unexpected error when adding Queue via Queue Service', code: 500 }
+          }
+          const addConvToQueueResponse = await QueueServiceClient.addConversationToQueue(addQueueResponse.data.id, queuedConversation)
+          if (addConvToQueueResponse.status !== 200) {
+            throw { message: 'Unexpected error when adding Conversation to Queue via Queue Service', code: 500 }
+          }
+        } else {
+          const addConvToQueueResponse = await QueueServiceClient.addConversationToQueue(getQueueResponse.data.id, queuedConversation)
+          if (addConvToQueueResponse.status !== 200) {
+            throw { message: 'Unexpected error when adding Conversation to Queue via Queue Service', code: 500 }
+          }
+        }
+      } catch (e) {
+        throw e
       }
-      // add Conversation to Queue
-      Promise.resolve(QueueServiceClient)
-
       resolve(Service.successResponse({
         newConversation,
       }));
