@@ -2,8 +2,8 @@ import { ConversationService } from '@vyrwu/ts-api'
 import { Configuration, Conversation } from '@vyrwu/ts-api/dist/conversation-service';
 
 const ConversationServiceAPI = (() => {
-    const localhostConfig: Configuration = {basePath: 'http://localhost:8080/v1', isJsonMime: (payload) => true}
-    const ConversationServiceClient = new ConversationService.DefaultApi(localhostConfig);
+    // const localhostConfig: Configuration = {basePath: 'http://localhost:8080/v1', isJsonMime: (payload) => true}
+    const ConversationServiceClient = new ConversationService.DefaultApi();
     return {
         addConversation: async (payload: Conversation) => {
             const response = await ConversationServiceClient.addConversation(payload);
