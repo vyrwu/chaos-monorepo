@@ -1,7 +1,7 @@
 const { transports, createLogger, format } = require('winston');
 
 const logger = createLogger({
-  level: 'info',
+  level: 'error',
   format: format.combine(
     format.timestamp(),
     format.json(),

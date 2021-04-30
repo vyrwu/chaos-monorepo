@@ -1,6 +1,6 @@
 {
   "name": "@vyrwu/ts-api",
-  "version": "1.27.0",
+  "version": "1.29.0",
   "description": "TypeScript API consuming the REST API of Dixa Test System Microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
