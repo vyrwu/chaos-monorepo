@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
+const { v4: uuidv4 } = require('uuid')
+const InMemoryDao = require('./dao');
 const Service = require('./Service');
 
+const dao = InMemoryDao()
 /**
 * Add a new Message
 * Add a new Message
@@ -11,13 +14,21 @@ const Service = require('./Service');
 const addMessage = ({ message }) => new Promise(
   async (resolve, reject) => {
     try {
+      const newMessage = {
+        id: uuidv4(),
+        created_at: Date.now(),
+        ...message,
+      }
+      if (dao.writeItem(newMessage) === dao.Responses.badRequest) {
+        throw { message: 'Item already exists', status: 400 }
+      }
       resolve(Service.successResponse({
         message,
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },

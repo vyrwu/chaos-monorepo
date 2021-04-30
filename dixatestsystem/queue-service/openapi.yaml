@@ -46,11 +46,15 @@ paths:
           schema:
             type: string
           required: true
-          description: ID of a Queue in which to put the conversation
+          description: ID of a Queue
           example: "e0064a57-b327-4f77-82d7-8042911613e8"
       responses:
         "200":
           description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Queue"
         "404":
           description: Queue Not Found
   /queue/{id}/conversation:
@@ -71,7 +75,7 @@ paths:
         "400":
           description: Invalid input
       requestBody:
-        description: Create a new Queue
+        description: Add conversation to Queue
         required: true
         content:
           application/json:
@@ -85,6 +89,9 @@ components:
           type: string
           format: uuid
           example: "f41b9796-a630-4d3e-9fd9-8be78373a48f"
+        name:
+          type: string
+          example: "test"
         created_at:
           type: string
           format: date-time
@@ -94,6 +101,10 @@ components:
           description: Algorithm used to offer services
           enum:
             - oneAtATimeRandom
+        conversations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueuedConversation'
     Queues:
       type: array
       items:
@@ -101,21 +112,10 @@ components:
     QueuedConversation:
       description: A conversation to be offered.
       properties:
-        id:
-          type: string
-          format: uuid
-          example: "e0064a57-b327-4f77-82d7-8042911613e8"
         conversation_id:
           type: string
           format: uuid
           example: "e0064a57-b327-4f77-82d7-8042911613e8"
-        isLive:
-          type: boolean
-          description: Whether the conversation has been offered to an agent already or not.
-        created_at:
-          type: string
-          format: date-time
-          example: "2017-07-21T17:32:28Z"
         channel:
           type: string
           enum:

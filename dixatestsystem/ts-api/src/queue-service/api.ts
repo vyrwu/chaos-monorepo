@@ -38,6 +38,12 @@ export interface Queue {
      * @type {string}
      * @memberof Queue
      */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Queue
+     */
     created_at?: string;
     /**
      * Algorithm used to offer services
@@ -45,6 +51,12 @@ export interface Queue {
      * @memberof Queue
      */
     offer_algorithm?: QueueOfferAlgorithmEnum;
+    /**
+     * 
+     * @type {Array<QueuedConversation>}
+     * @memberof Queue
+     */
+    conversations?: Array<QueuedConversation>;
 }
 
 /**
@@ -66,25 +78,7 @@ export interface QueuedConversation {
      * @type {string}
      * @memberof QueuedConversation
      */
-    id?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueuedConversation
-     */
     conversation_id?: string;
-    /**
-     * Whether the conversation has been offered to an agent already or not.
-     * @type {boolean}
-     * @memberof QueuedConversation
-     */
-    isLive?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueuedConversation
-     */
-    created_at?: string;
     /**
      * 
      * @type {string}
@@ -116,7 +110,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Add a Conversation to the Queue
          * @param {string} id ID of a Queue in which to put the conversation
-         * @param {QueuedConversation} queuedConversation Create a new Queue
+         * @param {QueuedConversation} queuedConversation Add conversation to Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -191,7 +185,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get a single Queue
-         * @param {string} id ID of a Queue in which to put the conversation
+         * @param {string} id ID of a Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -266,7 +260,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Add a Conversation to the Queue
          * @param {string} id ID of a Queue in which to put the conversation
-         * @param {QueuedConversation} queuedConversation Create a new Queue
+         * @param {QueuedConversation} queuedConversation Add conversation to Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -288,11 +282,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get a single Queue
-         * @param {string} id ID of a Queue in which to put the conversation
+         * @param {string} id ID of a Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getQueue(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async getQueue(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Queue>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getQueue(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -320,7 +314,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Add a Conversation to the Queue
          * @param {string} id ID of a Queue in which to put the conversation
-         * @param {QueuedConversation} queuedConversation Create a new Queue
+         * @param {QueuedConversation} queuedConversation Add conversation to Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -340,11 +334,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Get a single Queue
-         * @param {string} id ID of a Queue in which to put the conversation
+         * @param {string} id ID of a Queue
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getQueue(id: string, options?: any): AxiosPromise<void> {
+        getQueue(id: string, options?: any): AxiosPromise<Queue> {
             return localVarFp.getQueue(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -370,7 +364,7 @@ export class DefaultApi extends BaseAPI {
      * 
      * @summary Add a Conversation to the Queue
      * @param {string} id ID of a Queue in which to put the conversation
-     * @param {QueuedConversation} queuedConversation Create a new Queue
+     * @param {QueuedConversation} queuedConversation Add conversation to Queue
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -394,7 +388,7 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Get a single Queue
-     * @param {string} id ID of a Queue in which to put the conversation
+     * @param {string} id ID of a Queue
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi

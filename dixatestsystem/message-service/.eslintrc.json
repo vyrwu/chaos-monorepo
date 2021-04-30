@@ -4,6 +4,9 @@
   "extends": "airbnb-base",
   "rules": {
     "no-console": "off",
-    "semi": "off"
+    "semi": "off",
+    "arrow-parens": "off",
+    "no-throw-literal": "off",
+    "no-async-promise-executor": "off"
   }
 }

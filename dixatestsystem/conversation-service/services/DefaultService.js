@@ -1,11 +1,11 @@
+const { v4: uuidv4 } = require('uuid')
 const Service = require('./Service');
 const logger = require('../logger')
-const { v4: uuidv4 } = require('uuid')
 const ConversationOps = require('./ops')
-const ConversationDao = require('./dao')
+const InMemoryDao = require('./dao');
 
 const ops = ConversationOps()
-const dao = ConversationDao()
+const dao = InMemoryDao()
 
 /**
 * Add a new Conversation
@@ -22,25 +22,26 @@ const addConversation = async ({ conversation }) => new Promise(
       const newConversation = {
         id: uuidv4(),
         created_at: Date.now(),
-        ...conversation
+        ...conversation,
       }
-      if (dao.writeConversation(newConversation) === badRequest) {
+      if (dao.writeItem(newConversation) === badRequest) {
         throw { message: `Conversation with ID '${conversation.id}' already exists`, status: 400 }
       }
-      
+
       await Promise.all([
         ops.addMessage(newConversation),
-        ops.addConversationToForcedQueue(newConversation)
+        ops.addConversationToForcedQueue(newConversation),
       ])
 
       resolve(Service.successResponse({
         newConversation,
       }));
     } catch (e) {
-      logger.error(`${JSON.stringify(e)}`)
+      logger.error(e)
+      console.log(e)
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
-        e.status || 500,
+        e.status || 405,
       ));
     }
   },
@@ -57,7 +58,7 @@ const addMessageToConversation = ({ id, conversationMessage }) => new Promise(
     try {
       logger.info(`addMessageToConversation: ${JSON.stringify({ id, conversationMessage })}`)
       const { notFound } = dao.Responses
-      if (dao.readConversationById(id) === notFound) {
+      if (dao.readItemById(id) === notFound) {
         throw { message: `Conversation of ID '${id}' not found.`, status: 404 }
       }
       // MessageServiceClient.addMessage({ conversationId: id, ...conversationMessage })
@@ -84,7 +85,7 @@ const deleteConversation = ({ id }) => new Promise(
     try {
       logger.info(`deleteConversation: ${JSON.stringify({ id })}`)
       const { notFound } = dao.Responses
-      if (dao.deleteConversationById(id) === notFound) {
+      if (dao.deleteItemById(id) === notFound) {
         throw { message: `Conversation of ID '${id}' not found.`, code: 404 }
       }
       resolve(Service.successResponse({
@@ -109,7 +110,7 @@ const getConversation = ({ id }) => new Promise(
     try {
       logger.info(`getConversation: ${JSON.stringify({ id })}`)
       const { notFound } = dao.Responses
-      const target = dao.readConversationById(id)
+      const target = dao.readItemById(id)
       if (target === notFound) {
         throw { message: `Conversation of ID '${id}' not found.`, code: 404 }
       }
@@ -133,7 +134,7 @@ const getConversations = () => new Promise(
   async (resolve, reject) => {
     try {
       logger.info('getConversations: {}')
-      const conversations = dao.listConversations()
+      const conversations = dao.listItems()
       resolve(Service.successResponse({
         conversations,
       }));
