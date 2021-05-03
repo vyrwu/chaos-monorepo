@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: message-service
+spec:
+  hosts:
+  - message-service.default.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: message-service.default.svc.cluster.local
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx
+    # fault:
+    #   delay:
+    #     percentage:
+    #       value: 0.1
+    #     fixedDelay: 2s
+    #   abort:
+    #     percentage:
+    #       value: 0.1
+    #     httpStatus: 500
