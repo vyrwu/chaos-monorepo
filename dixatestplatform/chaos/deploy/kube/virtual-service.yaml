@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: chaos-controller
+spec:
+  hosts:
+  - chaos-controller.default.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: chaos-controller.default.svc.cluster.local
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx
+    # fault:
+    #   delay:
+    #     percentage:
+    #       value: 0.1
+    #     fixedDelay: 2s
+    #   abort:
+    #     percentage:
+    #       value: 0.1
+    #     httpStatus: 500

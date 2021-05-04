@@ -5,6 +5,7 @@ dirs=(
   "dixatestsystem/message-service"
   "dixatestsystem/queue-service"
   "loadgenerator"
+  "dixatestplaform/chaos"
 )
 
 root="${PWD}"

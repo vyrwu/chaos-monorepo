@@ -41,7 +41,7 @@ const addConversation = async ({ conversation }) => new Promise(
       console.log(e)
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
-        e.status || 405,
+        e.status || 500,
       ));
     }
   },
@@ -68,8 +68,8 @@ const addMessageToConversation = ({ id, conversationMessage }) => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
@@ -93,8 +93,8 @@ const deleteConversation = ({ id }) => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
@@ -119,8 +119,8 @@ const getConversation = ({ id }) => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
@@ -140,8 +140,8 @@ const getConversations = () => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
