@@ -1,0 +1,287 @@
+openapi: 3.0.2
+servers:
+  - url: http://dixatestplatform/chaos
+info:
+  description: |-
+    Platform for executing and monitoring Chaos experiments on the Dixa Test System, supporting the microservice-based system resiliency experimentation.
+  version: 0.0.1
+  title: Dixa Testing Platform - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+tags:
+  - name: tests
+    description: Definitions for test scenarios.
+  - name: runs
+    description: Results of test scenarios.
+paths:
+  /tests:
+    get:
+      tags:
+        - tests
+      summary: Get all tests
+      operationId: getTests
+      responses:
+        "200":
+          description: Successfuly operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tests"
+  /test:
+    post:
+      tags:
+        - tests
+      summary: Add a new Test
+      operationId: addTest
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      requestBody:
+        description: Create a new Test
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Test"
+  /test/{id}:
+    get:
+      tags:
+        - tests
+      summary: Get a single Test
+      operationId: getTest
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: ID of a Test
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Test"
+        "404":
+          description: Test Not Found
+    delete:
+      tags:
+        - tests
+      summary: Delete Test
+      operationId: deleteTest
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Test
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Test not found
+  /test/{id}/run/{mode}:
+    post:
+      tags: 
+        - tests
+      summary: Execute test scenarios.
+      operationId: runTest
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the test to execute
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        - in: path
+          name: mode
+          schema:
+            type: string
+            enum:
+              - canary
+              - production
+          required: true
+      responses:
+        "200":
+          description: Test has started successfuly
+        "400":
+          description: Mode not supported
+        "404":
+          description: Test not found
+  /test/{id}/stop:
+    post:
+      tags: 
+        - tests
+      summary: Stops the test scenario immediately, in a Big Red Button fashion.
+      operationId: stopTest
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the test to stop
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Test has started successfuly
+        "404":
+          description: Test not found
+  /runs:
+    get:
+      tags:
+        - runs
+      summary: Get all Runs
+      operationId: getRuns
+      responses:
+        "200":
+          description: Successfuly operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Runs"
+  /run:
+    post:
+      tags:
+        - runs
+      summary: Add a new Run
+      operationId: addRun
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      requestBody:
+        description: Create a new Run
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Run"
+  /run/{id}:
+    get:
+      tags:
+        - runs
+      summary: Get a single Run
+      operationId: getRun
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: ID of a Run
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Run"
+        "404":
+          description: Run Not Found
+    delete:
+      tags:
+        - runs
+      summary: Delete Run
+      operationId: deleteRun
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Run
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Run not found
+components:
+  schemas:
+    Test:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        name:
+          type: string
+          example: long-timeout
+        description:
+          type: string
+          description: Description of a tests scenario.
+        upstreamService:
+          type: string
+          description: Name of the upstream source service from which traffic flows to the downstreamService.
+          example: conversation-service
+        downstreamService:
+          type: string
+          description: Name of the downstream target service to which traffic flows from the upstreamService.
+          example: message-service
+        spec:
+          type: object
+          description: Istio standard HTTPRoute definition for specifying the types of perturbations to be injected. 
+          $ref: "https://raw.githubusercontent.com/istio/api/9abf4c87205f6ad04311fa021ce60803d8b95f78/networking/v1alpha3/virtual_service.gen.json#/components/schemas/istio.networking.v1alpha3.HTTPRoute"
+    Tests:
+      type: array
+      items:
+        $ref: "#/components/schemas/Test"
+    Run:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        status:
+          type: string
+          description: Status of the Test
+          enum:
+            - running
+            - stopped
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        results:
+          type: object
+          properties:
+            status:
+              enum:
+                - PASS
+                - FAIL
+            upstreamService:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: conversation-service
+                  logs:
+                    type: string
+            downstreamService:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: conversation-service
+                  logs:
+                    type: string
+    Runs:
+      type: array
+      items:
+        $ref: "#/components/schemas/Run"
