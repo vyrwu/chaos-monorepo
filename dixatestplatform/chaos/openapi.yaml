@@ -248,12 +248,18 @@ components:
           type: string
           format: uuid
           example: "e0064a57-b327-4f77-82d7-8042911613e8"
+        testId:
+          type: string
+          format: uuid
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
         status:
           type: string
           description: Status of the Test
           enum:
+            - started
             - running
             - stopped
+            - finished
         created_at:
           type: string
           format: date-time
@@ -281,6 +287,10 @@ components:
                     example: conversation-service
                   logs:
                     type: string
+        mode:
+          enum:
+            - canary
+            - production
     Runs:
       type: array
       items:

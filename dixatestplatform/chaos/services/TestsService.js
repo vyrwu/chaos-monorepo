@@ -1,10 +1,23 @@
 /* eslint-disable no-unused-vars */
+const k8s = require('@kubernetes/client-node')
 const { v4: uuidv4 } = require('uuid')
 const InMemoryDao = require('./dao');
 const Service = require('./Service');
 const logger = require('../logger');
+const RunsService = require('./RunsService')
 
 const testsDao = InMemoryDao()
+
+let kc
+try {
+  kc = new k8s.KubeConfig()
+  kc.loadFromDefault()
+} catch (e) {
+  console.log(e)
+  process.exit(1)
+}
+const k8sBatchApi = kc.makeApiClient(k8s.BatchV1Api);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api)
 /**
 * Add a new Test
 *
@@ -119,16 +132,47 @@ const runTest = ({ id, mode }) => new Promise(
   async (resolve, reject) => {
     try {
       // START JOB - RUN CHAOS EXPERIMENT
-      // In canary mode
-      // Start run
-      // Create new deps, vs and destinations for upstream and downstream svcs
-      // Modify original vservices to push X perc of traffic there
-      // Introduce perturbations on the canary path, according to test definition
-      resolve(Service.successResponse({
-        id,
+      logger.info('runTest', { id, mode })
+      const result = await k8sBatchApi.createNamespacedJob('default', {
+        apiVersion: 'batch/v1',
+        kind: 'Job',
+        metadata: {
+          generateName: 'chaos-run-',
+          labels: {
+            testType: 'chaos',
+            testId: id,
+            testMode: mode,
+          },
+        },
+        spec: {
+          template: {
+            metadata: {
+              annotations: {
+                'sidecar.istio.io/inject': 'false',
+              },
+            },
+            spec: {
+              containers: [
+                {
+                  name: 'consumer',
+                  image: 'busybox',
+                  command: ['/bin/sh', '-c'],
+                  args: ["echo 'Consuming data';sleep 1;exit 0"],
+                },
+              ],
+              restartPolicy: 'Never',
+            },
+          },
+        },
+      })
+      await RunsService.addRun({
+        testId: id,
+        status: 'scheduled',
         mode,
-      }));
+      })
+      resolve(Service.successResponse(`Chaos Test scheduled in '${mode}' mode. Check Job ID: '${result.response.body.metadata.name}'\n`));
     } catch (e) {
+      console.log(e)
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
         e.status || 500,
@@ -145,11 +189,11 @@ const runTest = ({ id, mode }) => new Promise(
 const stopTest = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
-      // START JOB - STOP CHAOS EXPERIMENT
-      // Redeoploy all services to the original states.
-      resolve(Service.successResponse({
-        id,
-      }));
+      // I must have the original Istio configs for services to know what to revert to.
+      // Options: 
+      // 1. Add a routeRedeploy method to services, and use it here to revert back to the original configuration. Requires to generate client lib (kinda need it anyways).
+      // 2. Copy service deploy/ files to container, then consume in this method. 
+      resolve(Service.successResponse(deploys.body.items));
     } catch (e) {
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
