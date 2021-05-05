@@ -26,8 +26,7 @@ const redeployAll = () => new Promise(
               }
               Promise.all(yamls.map(async (yamlName) => {
                 try {
-                  const response = await apply(`${serviceDirPath}/${yamlName}`)
-                  console.log(response)
+                  await apply(`${serviceDirPath}/${yamlName}`)
                 } catch (e) {
                   console.log(e)
                 }
@@ -38,8 +37,7 @@ const redeployAll = () => new Promise(
           }
         })
       })
-      resolve(Service.successResponse({
-      }));
+      resolve(Service.successResponse('Redeployment was successful.'));
     } catch (e) {
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',

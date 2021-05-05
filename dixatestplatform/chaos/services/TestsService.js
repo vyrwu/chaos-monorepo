@@ -1,12 +1,15 @@
 /* eslint-disable no-unused-vars */
 const k8s = require('@kubernetes/client-node')
 const { v4: uuidv4 } = require('uuid')
+const { K8sDeployer } = require('@vyrwu/ts-api')
 const InMemoryDao = require('./dao');
 const Service = require('./Service');
 const logger = require('../logger');
 const RunsService = require('./RunsService')
 
 const testsDao = InMemoryDao()
+
+const k8sDeployerApi = new K8sDeployer.DefaultApi()
 
 let kc
 try {
@@ -17,7 +20,7 @@ try {
   process.exit(1)
 }
 const k8sBatchApi = kc.makeApiClient(k8s.BatchV1Api);
-const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api)
+
 /**
 * Add a new Test
 *
@@ -189,11 +192,9 @@ const runTest = ({ id, mode }) => new Promise(
 const stopTest = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
-      // I must have the original Istio configs for services to know what to revert to.
-      // Options: 
-      // 1. Add a routeRedeploy method to services, and use it here to revert back to the original configuration. Requires to generate client lib (kinda need it anyways).
-      // 2. Copy service deploy/ files to container, then consume in this method. 
-      resolve(Service.successResponse(deploys.body.items));
+      // Modify run - set status to aborted
+      await k8sDeployerApi.redeployAll()
+      resolve(Service.successResponse(`Chaos Test '${id}' aborted.`));
     } catch (e) {
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
