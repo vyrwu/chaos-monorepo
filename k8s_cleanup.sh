@@ -1,11 +1,8 @@
 #!/bin/bash
 
 dirs=(
-  "dixatestsystem/conversation-service"
-  "dixatestsystem/message-service"
-  "dixatestsystem/queue-service"
   "loadgenerator"
-  "dixatestplaform/chaos"
+  "dixatestplatform/chaos"
 )
 
 root="${PWD}"
@@ -19,3 +16,8 @@ do
   ./cleanup.sh
   cd "${root}"
 done
+
+echo ""
+echo "Removing microservices"
+echo ""
+kubectl delete -f k8s-deployer/k8sYamls -R

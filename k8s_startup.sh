@@ -1,11 +1,8 @@
 #!/bin/bash
 
 dirs=(
-  "dixatestsystem/conversation-service"
-  "dixatestsystem/message-service"
-  "dixatestsystem/queue-service"
   "loadgenerator"
-  "dixatestplaform/chaos"
+  "dixatestplatform/chaos"
 )
 
 root="${PWD}"
@@ -19,3 +16,8 @@ do
   ./install_k8s.sh
   cd "${root}"
 done
+
+echo ""
+echo "Removing microservices"
+echo ""
+kubectl apply -f k8s-deployer/k8sYamls -R

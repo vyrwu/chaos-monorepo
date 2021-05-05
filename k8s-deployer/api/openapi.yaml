@@ -1,0 +1,20 @@
+openapi: 3.0.2
+info:
+  contact:
+    email: ano@dixa.com
+  description: Service for deploying services onto Kubernetes.
+  title: K8s Deployer - OpenAPI 3.0
+  version: 0.0.1
+servers:
+- url: http://k8s-deployer
+paths:
+  /redeployAll:
+    get:
+      operationId: redeployAll
+      responses:
+        "200":
+          description: Successfuly operation
+      summary: Redeploys all services to their latest image.
+      x-eov-operation-handler: controllers/DefaultController
+components:
+  schemas: {}

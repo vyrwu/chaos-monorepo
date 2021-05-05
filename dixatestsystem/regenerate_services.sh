@@ -17,15 +17,8 @@ generate_service () {
    java -jar ${GENERATOR_JAR} generate \
       -i ${DIR_NAME}/openapi.yaml \
       -g ${CLIENT_GENERATOR} \
-      -o "ts-api/src/${DIR_NAME}"
+      -o "../ts-api/src/${DIR_NAME}"
 }
-
-npm_token=$1
-if [ -z "$1" ]; then
-    echo "please provide valid npm token"
-    echo "usage ./regenerate_services.sh [npm_token]"
-    exit 1
-fi
 
 services_to_generate=( 
    "conversation-service"

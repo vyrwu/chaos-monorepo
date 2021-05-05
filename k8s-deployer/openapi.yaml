@@ -1,0 +1,18 @@
+openapi: 3.0.2
+servers:
+  - url: http://k8s-deployer
+info:
+  description: |-
+    Service for deploying services onto Kubernetes.
+  version: 0.0.1
+  title: K8s Deployer - OpenAPI 3.0
+  contact:
+    email: ano@dixa.com
+paths:
+  /redeployAll:
+    get:
+      summary: Redeploys all services to their latest image.
+      operationId: redeployAll
+      responses:
+        "200":
+          description: Successfuly operation
