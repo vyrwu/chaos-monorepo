@@ -90,7 +90,7 @@ const getTest = ({ id }) => new Promise(
       const { notFound } = testsDao.Responses
       const target = testsDao.readItemById(id)
       if (target === notFound) {
-        throw { message: `Test of ID '${id}' not found.`, code: 404 }
+        throw { message: `Test of ID '${id}' not found.\n`, code: 404 }
       }
       resolve(Service.successResponse({
         ...target,
@@ -134,51 +134,57 @@ const getTests = () => new Promise(
 const runTest = ({ id, mode }) => new Promise(
   async (resolve, reject) => {
     try {
+      const test = await getTest({ id })
+      if (test.code === 500) {
+        throw { message: test.error, status: test.code }
+      }
       // START JOB - RUN CHAOS EXPERIMENT
       logger.info('runTest', { id, mode })
-      const result = await k8sBatchApi.createNamespacedJob('default', {
-        apiVersion: 'batch/v1',
-        kind: 'Job',
-        metadata: {
-          generateName: 'chaos-run-',
-          labels: {
-            testType: 'chaos',
-            testId: id,
-            testMode: mode,
-          },
-        },
-        spec: {
-          template: {
-            metadata: {
-              annotations: {
-                'sidecar.istio.io/inject': 'false',
-              },
-            },
-            spec: {
-              containers: [
-                {
-                  name: 'consumer',
-                  image: 'busybox',
-                  command: ['/bin/sh', '-c'],
-                  args: ["echo 'Consuming data';sleep 1;exit 0"],
-                },
-              ],
-              restartPolicy: 'Never',
-            },
-          },
-        },
-      })
-      await RunsService.addRun({
+      const { newRun } = await RunsService.addRun({
         testId: id,
         status: 'scheduled',
         mode,
       })
+      // const result = await k8sBatchApi.createNamespacedJob('default', {
+      //   apiVersion: 'batch/v1',
+      //   kind: 'Job',
+      //   metadata: {
+      //     generateName: 'chaos-run-',
+      //     labels: {
+      //       runId: newRun.id,
+      //       testId: id,
+      //       testMode: mode,
+      //     },
+      //   },
+      //   spec: {
+      //     template: {
+      //       metadata: {
+      //         annotations: {
+      //           'sidecar.istio.io/inject': 'false',
+      //         },
+      //       },
+      //       spec: {
+      //         containers: [
+      //           {
+      //             generateName: 'chaos-worker-',
+      //             image: 'busybox',
+      //             command: ['node', 'dist/index.js'],
+      //             args: [''],
+      //           },
+      //         ],
+      //         restartPolicy: 'Never',
+      //       },
+      //     },
+      //   },
+      // })
+      // deployment name (upstream/downstream)
+      // virtual service definitions
       resolve(Service.successResponse(`Chaos Test scheduled in '${mode}' mode. Check Job ID: '${result.response.body.metadata.name}'\n`));
     } catch (e) {
       console.log(e)
       reject(Service.rejectResponse(
-        e.message || 'Internal Server Error',
-        e.status || 500,
+        e.error || 'Internal Server Error',
+        e.code || 500,
       ));
     }
   },

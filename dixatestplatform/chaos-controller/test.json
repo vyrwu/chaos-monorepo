@@ -1,0 +1,22 @@
+{
+  "name": "test",
+  "description": "test",
+  "upstreamService": "conversation-service",
+  "downstreamService": "message-service",
+  "spec": {
+    "fault": {
+      "delay": {
+        "percentage": {
+          "value": "0.1"
+        },
+        "fixedDelay": "2s"
+      }
+    },
+    "abort": {
+      "percentage": {
+        "value": "0.1"
+      },
+      "httpStatus": "500"
+    }
+  }
+}
