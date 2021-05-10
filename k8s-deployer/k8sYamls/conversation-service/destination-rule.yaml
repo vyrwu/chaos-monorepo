@@ -3,4 +3,8 @@ kind: DestinationRule
 metadata:
   name: conversation-service
 spec:
-  host: conversation-service.default.svc.cluster.local
+  host: conversation-service.default.svc.clusters.local
+  subsets:
+    - name: production
+      labels:
+        deployment-type: production

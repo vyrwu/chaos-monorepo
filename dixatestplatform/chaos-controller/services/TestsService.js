@@ -139,7 +139,7 @@ const runTest = ({ id, mode }) => new Promise(
         throw { message: test.error, status: test.code }
       }
       logger.info('runTest', { id, mode })
-      const { newRun } = await RunsService.addRun({
+      const newRun = await RunsService.addRun({
         testId: id,
         status: 'scheduled',
         mode,
@@ -166,7 +166,7 @@ const runTest = ({ id, mode }) => new Promise(
             spec: {
               containers: [
                 {
-                  generateName: 'chaos-worker-',
+                  generateName: 'worker',
                   image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
                   command: ['node', 'dist/index.js'],
                   args: [`${mode}`, `${upstreamService}`, `${downstreamService}`, `${spec}`],

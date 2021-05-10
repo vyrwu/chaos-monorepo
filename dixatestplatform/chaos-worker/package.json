@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "prestart": "npm install",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/index.js canary conversation-service queue-service '{\"abort\": \"yes\"}'"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.14.3"
+    "@kubernetes/client-node": "^0.14.3",
+    "js-yaml": "^3.14.1"
   }
 }

@@ -21,6 +21,591 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
+/**
+ * Describes the Cross-Origin Resource Sharing (CORS) policy, for a given service. Refer to [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) for further details about cross origin resource sharing. For example, the following rule restricts cross origin requests to those originating from example.com domain using HTTP POST/GET, and sets the `Access-Control-Allow-Credentials` header to false. In addition, it only exposes `X-Foo-bar` header and sets an expiry period of 1 day.
+ * @export
+ * @interface IstioNetworkingV1alpha3CorsPolicy
+ */
+export interface IstioNetworkingV1alpha3CorsPolicy {
+    /**
+     * The list of origins that are allowed to perform CORS requests. The content will be serialized into the Access-Control-Allow-Origin header. Wildcard * will allow all origins. $hide_from_docs
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     * @deprecated
+     */
+    allowOrigin?: Array<string>;
+    /**
+     * String patterns that match allowed origins. An origin is allowed if any of the string matchers match. If a match is found, then the outgoing Access-Control-Allow-Origin would be set to the origin as provided by the client.
+     * @type {Array<IstioNetworkingV1alpha3StringMatch>}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    allowOrigins?: Array<IstioNetworkingV1alpha3StringMatch>;
+    /**
+     * List of HTTP methods allowed to access the resource. The content will be serialized into the Access-Control-Allow-Methods header.
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    allowMethods?: Array<string>;
+    /**
+     * List of HTTP headers that can be used when requesting the resource. Serialized to Access-Control-Allow-Headers header.
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    allowHeaders?: Array<string>;
+    /**
+     * A list of HTTP headers that the browsers are allowed to access. Serialized into Access-Control-Expose-Headers header.
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    exposeHeaders?: Array<string>;
+    /**
+     * Specifies how long the results of a preflight request can be cached. Translates to the `Access-Control-Max-Age` header.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    maxAge?: string;
+    /**
+     * Indicates whether the caller is allowed to send the actual request (not the preflight) using credentials. Translates to `Access-Control-Allow-Credentials` header.
+     * @type {boolean}
+     * @memberof IstioNetworkingV1alpha3CorsPolicy
+     */
+    allowCredentials?: boolean | null;
+}
+/**
+ * Describes the delegate VirtualService. The following routing rules forward the traffic to `/productpage` by a delegate VirtualService named `productpage`, forward the traffic to `/reviews` by a delegate VirtualService named `reviews`.
+ * @export
+ * @interface IstioNetworkingV1alpha3Delegate
+ */
+export interface IstioNetworkingV1alpha3Delegate {
+    /**
+     * Name specifies the name of the delegate VirtualService.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3Delegate
+     */
+    name?: string;
+    /**
+     * Namespace specifies the namespace where the delegate VirtualService resides. By default, it is same to the root\'s.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3Delegate
+     */
+    namespace?: string;
+}
+/**
+ * Destination indicates the network addressable service to which the request/connection will be sent after processing a routing rule. The destination.host should unambiguously refer to a service in the service registry. Istio\'s service registry is composed of all the services found in the platform\'s service registry (e.g., Kubernetes services, Consul services), as well as services declared through the [ServiceEntry](https://istio.io/docs/reference/config/networking/service-entry/#ServiceEntry) resource.
+ * @export
+ * @interface IstioNetworkingV1alpha3Destination
+ */
+export interface IstioNetworkingV1alpha3Destination {
+    /**
+     * The name of a service from the service registry. Service names are looked up from the platform\'s service registry (e.g., Kubernetes services, Consul services, etc.) and from the hosts declared by [ServiceEntry](https://istio.io/docs/reference/config/networking/service-entry/#ServiceEntry). Traffic forwarded to destinations that are not found in either of the two, will be dropped.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3Destination
+     */
+    host?: string;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3PortSelector}
+     * @memberof IstioNetworkingV1alpha3Destination
+     */
+    port?: IstioNetworkingV1alpha3PortSelector;
+    /**
+     * The name of a subset within the service. Applicable only to services within the mesh. The subset must be defined in a corresponding DestinationRule.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3Destination
+     */
+    subset?: string;
+}
+/**
+ * HTTPFaultInjection can be used to specify one or more faults to inject while forwarding HTTP requests to the destination specified in a route. Fault specification is part of a VirtualService rule. Faults include aborting the Http request from downstream service, and/or delaying proxying of requests. A fault rule MUST HAVE delay or abort or both.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjection
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjection {
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPFaultInjectionDelay}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjection
+     */
+    delay?: IstioNetworkingV1alpha3HTTPFaultInjectionDelay;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPFaultInjectionAbort}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjection
+     */
+    abort?: IstioNetworkingV1alpha3HTTPFaultInjectionAbort;
+}
+/**
+ * @type IstioNetworkingV1alpha3HTTPFaultInjectionAbort
+ * Abort specification is used to prematurely abort a request with a pre-specified error code. The following example will return an HTTP 400 error code for 1 out of every 1000 requests to the \"ratings\" service \"v1\".
+ * @export
+ */
+export type IstioNetworkingV1alpha3HTTPFaultInjectionAbort = IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf | IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf1 | IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf2 | object;
+
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf {
+    /**
+     * HTTP status code to use to abort the Http request.
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf
+     */
+    httpStatus: number;
+}
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf1
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf1
+     */
+    grpcStatus: string;
+}
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf2
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf2 {
+    /**
+     * 
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjectionAbortOneOf2
+     */
+    http2Error: string;
+}
+/**
+ * @type IstioNetworkingV1alpha3HTTPFaultInjectionDelay
+ * Delay specification is used to inject latency into the request forwarding path. The following example will introduce a 5 second delay in 1 out of every 1000 requests to the \"v1\" version of the \"reviews\" service from all pods with label env: prod
+ * @export
+ */
+export type IstioNetworkingV1alpha3HTTPFaultInjectionDelay = IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf | IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf1 | object;
+
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf {
+    /**
+     * Add a fixed delay before forwarding the request. Format: 1h/1m/1s/1ms. MUST be >=1ms.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf
+     */
+    fixedDelay: string;
+}
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf1
+ */
+export interface IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPFaultInjectionDelayOneOf1
+     */
+    exponentialDelay: string;
+}
+/**
+ * HttpMatchRequest specifies a set of criterion to be met in order for the rule to be applied to the HTTP request. For example, the following restricts the rule to match only requests where the URL path starts with /ratings/v2/ and the request contains a custom `end-user` header with value `jason`.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPMatchRequest
+ */
+export interface IstioNetworkingV1alpha3HTTPMatchRequest {
+    /**
+     * The name assigned to a match. The match\'s name will be concatenated with the parent route\'s name and will be logged in the access logs for requests matching this route.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    name?: string;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3StringMatch}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    method?: IstioNetworkingV1alpha3StringMatch;
+    /**
+     * Specifies the ports on the host that is being addressed. Many services only expose a single port or label ports with the protocols they support, in these cases it is not required to explicitly select the port.
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    port?: number;
+    /**
+     * Names of gateways where the rule should be applied. Gateway names in the top-level `gateways` field of the VirtualService (if any) are overridden. The gateway match is independent of sourceLabels.
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    gateways?: Array<string>;
+    /**
+     * The header keys must be lowercase and use hyphen as the separator, e.g. _x-request-id_.
+     * @type {{ [key: string]: IstioNetworkingV1alpha3StringMatch; }}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    headers?: { [key: string]: IstioNetworkingV1alpha3StringMatch; };
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3StringMatch}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    uri?: IstioNetworkingV1alpha3StringMatch;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3StringMatch}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    scheme?: IstioNetworkingV1alpha3StringMatch;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3StringMatch}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    authority?: IstioNetworkingV1alpha3StringMatch;
+    /**
+     * One or more labels that constrain the applicability of a rule to workloads with the given labels. If the VirtualService has a list of gateways specified in the top-level `gateways` field, it must include the reserved gateway `mesh` for this field to be applicable.
+     * @type {{ [key: string]: string; }}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    sourceLabels?: { [key: string]: string; };
+    /**
+     * Query parameters for matching.
+     * @type {{ [key: string]: IstioNetworkingV1alpha3StringMatch; }}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    queryParams?: { [key: string]: IstioNetworkingV1alpha3StringMatch; };
+    /**
+     * Flag to specify whether the URI matching should be case-insensitive.
+     * @type {boolean}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    ignoreUriCase?: boolean;
+    /**
+     * withoutHeader has the same syntax with the header, but has opposite meaning. If a header is matched with a matching rule among withoutHeader, the traffic becomes not matched one.
+     * @type {{ [key: string]: IstioNetworkingV1alpha3StringMatch; }}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    withoutHeaders?: { [key: string]: IstioNetworkingV1alpha3StringMatch; };
+    /**
+     * Source namespace constraining the applicability of a rule to workloads in that namespace. If the VirtualService has a list of gateways specified in the top-level `gateways` field, it must include the reserved gateway `mesh` for this field to be applicable.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPMatchRequest
+     */
+    sourceNamespace?: string;
+}
+/**
+ * HTTPRedirect can be used to send a 301 redirect response to the caller, where the Authority/Host and the URI in the response can be swapped with the specified values. For example, the following rule redirects requests for /v1/getProductRatings API on the ratings service to /v1/bookRatings provided by the bookratings service.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPRedirect
+ */
+export interface IstioNetworkingV1alpha3HTTPRedirect {
+    /**
+     * On a redirect, overwrite the Path portion of the URL with this value. Note that the entire path will be replaced, irrespective of the request URI being matched as an exact path or prefix.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRedirect
+     */
+    uri?: string;
+    /**
+     * On a redirect, overwrite the Authority/Host portion of the URL with this value.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRedirect
+     */
+    authority?: string;
+    /**
+     * On a redirect, Specifies the HTTP status code to use in the redirect response. The default response code is MOVED_PERMANENTLY (301).
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPRedirect
+     */
+    redirectCode?: number;
+}
+/**
+ * Describes the retry policy to use when a HTTP request fails. For example, the following rule sets the maximum number of retries to 3 when calling ratings:v1 service, with a 2s timeout per retry attempt.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPRetry
+ */
+export interface IstioNetworkingV1alpha3HTTPRetry {
+    /**
+     * Number of retries to be allowed for a given request. The interval between retries will be determined automatically (25ms+). When request `timeout` of the [HTTP route](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRoute) or `per_try_timeout` is configured, the actual number of retries attempted also depends on the specified request `timeout` and `per_try_timeout` values.
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPRetry
+     */
+    attempts?: number;
+    /**
+     * Timeout per attempt for a given request, including the initial call and any retries. Format: 1h/1m/1s/1ms. MUST BE >=1ms. Default is same value as request `timeout` of the [HTTP route](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRoute), which means no timeout.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRetry
+     */
+    perTryTimeout?: string;
+    /**
+     * Specifies the conditions under which retry takes place. One or more policies can be specified using a ‘,’ delimited list. See the [retry policies](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on) and [gRPC retry policies](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-grpc-on) for more details.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRetry
+     */
+    retryOn?: string;
+    /**
+     * Flag to specify whether the retries should retry to other localities. See the [retry plugin configuration](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management#retry-plugin-configuration) for more details.
+     * @type {boolean}
+     * @memberof IstioNetworkingV1alpha3HTTPRetry
+     */
+    retryRemoteLocalities?: boolean | null;
+}
+/**
+ * HTTPRewrite can be used to rewrite specific parts of a HTTP request before forwarding the request to the destination. Rewrite primitive can be used only with HTTPRouteDestination. The following example demonstrates how to rewrite the URL prefix for api call (/ratings) to ratings service before making the actual API call.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPRewrite
+ */
+export interface IstioNetworkingV1alpha3HTTPRewrite {
+    /**
+     * rewrite the path (or the prefix) portion of the URI with this value. If the original URI was matched based on prefix, the value provided in this field will replace the corresponding matched prefix.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRewrite
+     */
+    uri?: string;
+    /**
+     * rewrite the Authority/Host header with this value.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRewrite
+     */
+    authority?: string;
+}
+/**
+ * Describes match conditions and actions for routing HTTP/1.1, HTTP2, and gRPC traffic. See VirtualService for usage examples.
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPRoute
+ */
+export interface IstioNetworkingV1alpha3HTTPRoute {
+    /**
+     * The name assigned to the route for debugging purposes. The route\'s name will be concatenated with the match\'s name and will be logged in the access logs for requests matching this route/match.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    name?: string;
+    /**
+     * A HTTP rule can either redirect or forward (default) traffic. The forwarding target can be one of several versions of a service (see glossary in beginning of document). Weights associated with the service version determine the proportion of traffic it receives.
+     * @type {Array<IstioNetworkingV1alpha3HTTPRouteDestination>}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    route?: Array<IstioNetworkingV1alpha3HTTPRouteDestination>;
+    /**
+     * Match conditions to be satisfied for the rule to be activated. All conditions inside a single match block have AND semantics, while the list of match blocks have OR semantics. The rule is matched if any one of the match blocks succeed.
+     * @type {Array<IstioNetworkingV1alpha3HTTPMatchRequest>}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    match?: Array<IstioNetworkingV1alpha3HTTPMatchRequest>;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPRedirect}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    redirect?: IstioNetworkingV1alpha3HTTPRedirect;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Delegate}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    delegate?: IstioNetworkingV1alpha3Delegate;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPRewrite}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    rewrite?: IstioNetworkingV1alpha3HTTPRewrite;
+    /**
+     * Timeout for HTTP requests, default is disabled.
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    timeout?: string;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPRetry}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    retries?: IstioNetworkingV1alpha3HTTPRetry;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPFaultInjection}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    fault?: IstioNetworkingV1alpha3HTTPFaultInjection;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Destination}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    mirror?: IstioNetworkingV1alpha3Destination;
+    /**
+     * Percentage of the traffic to be mirrored by the `mirror` field. Use of integer `mirror_percent` value is deprecated. Use the double `mirror_percentage` field instead
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     * @deprecated
+     */
+    mirrorPercent?: number | null;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Percent}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    mirrorPercentage?: IstioNetworkingV1alpha3Percent;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3CorsPolicy}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    corsPolicy?: IstioNetworkingV1alpha3CorsPolicy;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Headers}
+     * @memberof IstioNetworkingV1alpha3HTTPRoute
+     */
+    headers?: IstioNetworkingV1alpha3Headers;
+}
+/**
+ * Each routing rule is associated with one or more service versions (see glossary in beginning of document). Weights associated with the version determine the proportion of traffic it receives. For example, the following rule will route 25% of traffic for the \"reviews\" service to instances with the \"v2\" tag and the remaining traffic (i.e., 75%) to \"v1\".
+ * @export
+ * @interface IstioNetworkingV1alpha3HTTPRouteDestination
+ */
+export interface IstioNetworkingV1alpha3HTTPRouteDestination {
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Headers}
+     * @memberof IstioNetworkingV1alpha3HTTPRouteDestination
+     */
+    headers?: IstioNetworkingV1alpha3Headers;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3Destination}
+     * @memberof IstioNetworkingV1alpha3HTTPRouteDestination
+     */
+    destination?: IstioNetworkingV1alpha3Destination;
+    /**
+     * The proportion of traffic to be forwarded to the service version. (0-100). Sum of weights across destinations SHOULD BE == 100. If there is only one destination in a rule, the weight value is assumed to be 100.
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3HTTPRouteDestination
+     */
+    weight?: number;
+}
+/**
+ * Message headers can be manipulated when Envoy forwards requests to, or responses from, a destination service. Header manipulation rules can be specified for a specific route destination or for all destinations. The following VirtualService adds a `test` header with the value `true` to requests that are routed to any `reviews` service destination. It also removes the `foo` response header, but only from responses coming from the `v1` subset (version) of the `reviews` service.
+ * @export
+ * @interface IstioNetworkingV1alpha3Headers
+ */
+export interface IstioNetworkingV1alpha3Headers {
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HeadersHeaderOperations}
+     * @memberof IstioNetworkingV1alpha3Headers
+     */
+    response?: IstioNetworkingV1alpha3HeadersHeaderOperations;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HeadersHeaderOperations}
+     * @memberof IstioNetworkingV1alpha3Headers
+     */
+    request?: IstioNetworkingV1alpha3HeadersHeaderOperations;
+}
+/**
+ * HeaderOperations Describes the header manipulations to apply
+ * @export
+ * @interface IstioNetworkingV1alpha3HeadersHeaderOperations
+ */
+export interface IstioNetworkingV1alpha3HeadersHeaderOperations {
+    /**
+     * Overwrite the headers specified by key with the given values
+     * @type {{ [key: string]: string; }}
+     * @memberof IstioNetworkingV1alpha3HeadersHeaderOperations
+     */
+    set?: { [key: string]: string; };
+    /**
+     * Append the given values to the headers specified by keys (will create a comma-separated list of values)
+     * @type {{ [key: string]: string; }}
+     * @memberof IstioNetworkingV1alpha3HeadersHeaderOperations
+     */
+    add?: { [key: string]: string; };
+    /**
+     * Remove a the specified headers
+     * @type {Array<string>}
+     * @memberof IstioNetworkingV1alpha3HeadersHeaderOperations
+     */
+    remove?: Array<string>;
+}
+/**
+ * Percent specifies a percentage in the range of [0.0, 100.0].
+ * @export
+ * @interface IstioNetworkingV1alpha3Percent
+ */
+export interface IstioNetworkingV1alpha3Percent {
+    /**
+     * 
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3Percent
+     */
+    value?: number;
+}
+/**
+ * PortSelector specifies the number of a port to be used for matching or selection for final routing.
+ * @export
+ * @interface IstioNetworkingV1alpha3PortSelector
+ */
+export interface IstioNetworkingV1alpha3PortSelector {
+    /**
+     * Valid port number
+     * @type {number}
+     * @memberof IstioNetworkingV1alpha3PortSelector
+     */
+    number?: number;
+}
+/**
+ * @type IstioNetworkingV1alpha3StringMatch
+ * Describes how to match a given string in HTTP headers. Match is case-sensitive.
+ * @export
+ */
+export type IstioNetworkingV1alpha3StringMatch = IstioNetworkingV1alpha3StringMatchOneOf | IstioNetworkingV1alpha3StringMatchOneOf1 | IstioNetworkingV1alpha3StringMatchOneOf2 | object;
+
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3StringMatchOneOf
+ */
+export interface IstioNetworkingV1alpha3StringMatchOneOf {
+    /**
+     * exact string match
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3StringMatchOneOf
+     */
+    exact: string;
+}
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3StringMatchOneOf1
+ */
+export interface IstioNetworkingV1alpha3StringMatchOneOf1 {
+    /**
+     * prefix-based match
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3StringMatchOneOf1
+     */
+    prefix: string;
+}
+/**
+ * 
+ * @export
+ * @interface IstioNetworkingV1alpha3StringMatchOneOf2
+ */
+export interface IstioNetworkingV1alpha3StringMatchOneOf2 {
+    /**
+     * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+     * @type {string}
+     * @memberof IstioNetworkingV1alpha3StringMatchOneOf2
+     */
+    regex: string;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -28,6 +613,48 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Deploy a service or force it\'s redeployment.
+         * @param {string} name Name of the Service to be deployed
+         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
+         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployService: async (name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('deployService', 'name', name)
+            // verify required parameter 'type' is not null or undefined
+            assertParamExists('deployService', 'type', type)
+            const localVarPath = `/service/{name}/deploy/{type}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)))
+                .replace(`{${"type"}}`, encodeURIComponent(String(type)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(istioNetworkingV1alpha3HTTPRoute, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Redeploys all services to their latest image.
@@ -70,6 +697,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Deploy a service or force it\'s redeployment.
+         * @param {string} name Name of the Service to be deployed
+         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
+         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Redeploys all services to their latest image.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -90,6 +730,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Deploy a service or force it\'s redeployment.
+         * @param {string} name Name of the Service to be deployed
+         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
+         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any): AxiosPromise<void> {
+            return localVarFp.deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Redeploys all services to their latest image.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -107,6 +759,20 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Deploy a service or force it\'s redeployment.
+     * @param {string} name Name of the Service to be deployed
+     * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
+     * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any) {
+        return DefaultApiFp(this.configuration).deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Redeploys all services to their latest image.

@@ -40,4 +40,10 @@ async function apply(specPath) {
   return created;
 }
 
-module.exports = { apply }
+function read(specPath) {
+  const specString = fs.readFileSync(specPath, 'utf8');
+  const spec = yaml.safeLoad(specString);
+  return spec
+}
+
+module.exports = { apply, read }

@@ -6,14 +6,16 @@ spec:
   hosts:
   - conversation-service.default.svc.cluster.local
   http:
-  - route:
+  - name: production
+    route:
     - destination:
-        host: conversation-service.default.svc.cluster.local
-    retries:
-      attempts: 3
-      perTryTimeout: 2s
-      retryOn: 5xx
-    # fault:
+        host: conversation-service.svc.cluster.local
+        subset: production
+    # retries:
+    #   attempts: 3
+    #   perTryTimeout: 2s
+    #   retryOn: 5xx
+    # # fault:
     #   delay:
     #     percentage:
     #       value: 0.1

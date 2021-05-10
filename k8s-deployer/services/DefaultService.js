@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const { apply } = require('./util');
 const Service = require('./Service');
-
+const { deployChaosCanaryCluster, addChaosRouting, addChaosDestinationSubset } = require('./ops')
 /**
 * Redeploys all services to their latest image.
 *
@@ -47,6 +47,32 @@ const redeployAll = () => new Promise(
   },
 );
 
+/**
+* Deploys a service.
+*
+* no response value expected for this operation
+* */
+const deployService = ({ name, type, spec }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      const defaultNamespace = 'default'
+      const result = await Promise.all([
+        deployChaosCanaryCluster(name, defaultNamespace),
+        addChaosRouting(name, defaultNamespace, spec),
+        addChaosDestinationSubset(name, defaultNamespace),
+      ])
+      console.log(result)
+      resolve(Service.successResponse('Deployment was successful.'));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Internal Server Error',
+        e.status || 500,
+      ));
+    }
+  },
+);
+
 module.exports = {
   redeployAll,
+  deployService,
 };

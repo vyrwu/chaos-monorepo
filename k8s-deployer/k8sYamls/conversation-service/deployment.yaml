@@ -4,16 +4,19 @@ metadata:
   name: conversation-service
   labels:
     dixa-app: conversation-service
+    deployment-type: production
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dixa-app: conversation-service 
+      dixa-app: conversation-service
+      deployment-type: production
   template:
     metadata:
       name: conversation-service
       labels:
         dixa-app: conversation-service
+        deployment-type: production
     spec:
       containers:
       - name: conversation-service
