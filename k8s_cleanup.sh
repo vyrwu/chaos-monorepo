@@ -2,7 +2,7 @@
 
 dirs=(
   "loadgenerator"
-  "dixatestplatform/chaos"
+  "dixatestplatform/chaos-controller"
 )
 
 root="${PWD}"

@@ -220,7 +220,7 @@ components:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z"
-        name:
+        displayName:
           type: string
           example: long-timeout
         description:
@@ -237,7 +237,7 @@ components:
         spec:
           type: object
           description: Istio standard HTTPRoute definition for specifying the types of perturbations to be injected. 
-          $ref: "https://raw.githubusercontent.com/istio/api/9abf4c87205f6ad04311fa021ce60803d8b95f78/networking/v1alpha3/virtual_service.gen.json#/components/schemas/istio.networking.v1alpha3.HTTPRoute"
+          $ref: "./openapi-istio.json#/components/schemas/istio.networking.v1alpha3.HTTPRoute"
     Tests:
       type: array
       items:

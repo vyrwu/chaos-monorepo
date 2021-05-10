@@ -2,7 +2,7 @@
 
 dirs=(
   "loadgenerator"
-  "dixatestplatform/chaos"
+  "dixatestplatform/chaos-controller"
 )
 
 root="${PWD}"
@@ -18,6 +18,6 @@ do
 done
 
 echo ""
-echo "Removing microservices"
+echo "Installing microservices"
 echo ""
 kubectl apply -f k8s-deployer/k8sYamls -R

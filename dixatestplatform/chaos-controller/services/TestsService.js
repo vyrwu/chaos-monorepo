@@ -138,47 +138,45 @@ const runTest = ({ id, mode }) => new Promise(
       if (test.code === 500) {
         throw { message: test.error, status: test.code }
       }
-      // START JOB - RUN CHAOS EXPERIMENT
       logger.info('runTest', { id, mode })
       const { newRun } = await RunsService.addRun({
         testId: id,
         status: 'scheduled',
         mode,
       })
-      // const result = await k8sBatchApi.createNamespacedJob('default', {
-      //   apiVersion: 'batch/v1',
-      //   kind: 'Job',
-      //   metadata: {
-      //     generateName: 'chaos-run-',
-      //     labels: {
-      //       runId: newRun.id,
-      //       testId: id,
-      //       testMode: mode,
-      //     },
-      //   },
-      //   spec: {
-      //     template: {
-      //       metadata: {
-      //         annotations: {
-      //           'sidecar.istio.io/inject': 'false',
-      //         },
-      //       },
-      //       spec: {
-      //         containers: [
-      //           {
-      //             generateName: 'chaos-worker-',
-      //             image: 'busybox',
-      //             command: ['node', 'dist/index.js'],
-      //             args: [''],
-      //           },
-      //         ],
-      //         restartPolicy: 'Never',
-      //       },
-      //     },
-      //   },
-      // })
-      // deployment name (upstream/downstream)
-      // virtual service definitions
+      const { upstreamService, downstreamService, spec } = test
+      const result = await k8sBatchApi.createNamespacedJob('default', {
+        apiVersion: 'batch/v1',
+        kind: 'Job',
+        metadata: {
+          generateName: 'chaos-run-',
+          labels: {
+            runId: newRun.id,
+            testId: id,
+            testMode: mode,
+          },
+        },
+        spec: {
+          template: {
+            metadata: {
+              annotations: {
+                'sidecar.istio.io/inject': 'false',
+              },
+            },
+            spec: {
+              containers: [
+                {
+                  generateName: 'chaos-worker-',
+                  image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
+                  command: ['node', 'dist/index.js'],
+                  args: [`${mode}`, `${upstreamService}`, `${downstreamService}`, `${spec}`],
+                },
+              ],
+              restartPolicy: 'Never',
+            },
+          },
+        },
+      })
       resolve(Service.successResponse(`Chaos Test scheduled in '${mode}' mode. Check Job ID: '${result.response.body.metadata.name}'\n`));
     } catch (e) {
       console.log(e)
@@ -198,7 +196,8 @@ const runTest = ({ id, mode }) => new Promise(
 const stopTest = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
-      // Modify run - set status to aborted
+      // TODO: Modify run - set status to aborted
+      // TODO: Clean-up all chaos-test resources (Virtual-services, destinations, jobs)
       await k8sDeployerApi.redeployAll()
       resolve(Service.successResponse(`Chaos Test '${id}' aborted.`));
     } catch (e) {
