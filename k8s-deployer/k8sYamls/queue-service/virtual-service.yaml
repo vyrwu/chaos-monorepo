@@ -4,15 +4,22 @@ metadata:
   name: queue-service
 spec:
   hosts:
-  - queue-service.default.svc.cluster.local
+  - queue-service
   http:
-  - route:
+  - name: 'production'
+    route:
     - destination:
-        host: queue-service.default.svc.cluster.local
+        host: queue-service
+      weight: 100
     retries:
       attempts: 3
       perTryTimeout: 2s
       retryOn: 5xx
+    # mirror:
+    #   host: queue-service.svc.cluster.local
+    #   subset: chaos-canary
+    # mirrorPercentage: 
+    #   value: 10
     # fault:
     #   delay:
     #     percentage:

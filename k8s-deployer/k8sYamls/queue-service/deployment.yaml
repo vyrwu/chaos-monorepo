@@ -4,16 +4,19 @@ metadata:
   name: queue-service
   labels:
     dixa-app: queue-service
+    deployment-type: production
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dixa-app: queue-service 
+      dixa-app: queue-service
+      deployment-type: production
   template:
     metadata:
       name: queue-service
       labels:
         dixa-app: queue-service
+        deployment-type: production
     spec:
       containers:
       - name: queue-service

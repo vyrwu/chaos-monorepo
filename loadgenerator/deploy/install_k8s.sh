@@ -1,3 +1,5 @@
 #!/bin/bash
 
-kubectl apply -n default -f kube/
+namespace=$1
+
+kubectl apply -n "${namespace}" -f kube/

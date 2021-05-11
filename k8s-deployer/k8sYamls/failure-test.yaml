@@ -15,6 +15,11 @@ spec:
       attempts: 3
       perTryTimeout: 2s
       retryOn: 5xx
+    fault:
+      abort:
+        percentage:
+          value: 10
+        httpStatus: 500
     # mirror:
     #   host: message-service.svc.cluster.local
     #   subset: chaos-canary
@@ -25,7 +30,4 @@ spec:
     #     percentage:
     #       value: 0.1
     #     fixedDelay: 2s
-    #   abort:
-    #     percentage:
-    #       value: 0.1
-    #     httpStatus: 500
+    

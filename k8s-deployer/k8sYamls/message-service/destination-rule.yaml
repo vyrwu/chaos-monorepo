@@ -3,4 +3,4 @@ kind: DestinationRule
 metadata:
   name: message-service
 spec:
-  host: message-service.default.svc.cluster.local
+  host: message-service

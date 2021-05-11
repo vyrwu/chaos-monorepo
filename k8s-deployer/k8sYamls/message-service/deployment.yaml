@@ -4,16 +4,19 @@ metadata:
   name: message-service
   labels:
     dixa-app: message-service
+    deployment-type: production
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dixa-app: message-service 
+      dixa-app: message-service
+      deployment-type: production
   template:
     metadata:
       name: message-service
       labels:
         dixa-app: message-service
+        deployment-type: production
     spec:
       containers:
       - name: message-service

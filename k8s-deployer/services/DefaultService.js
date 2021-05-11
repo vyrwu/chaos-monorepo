@@ -55,6 +55,9 @@ const redeployAll = () => new Promise(
 const deployService = ({ name, type, spec }) => new Promise(
   async (resolve, reject) => {
     try {
+      if (type !== 'chaos-canary') {
+        throw { message: `Unsupported deployment type '${type}'`, code: 400 }
+      }
       const defaultNamespace = 'default'
       const result = await Promise.all([
         deployChaosCanaryCluster(name, defaultNamespace),

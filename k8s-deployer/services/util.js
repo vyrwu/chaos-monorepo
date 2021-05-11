@@ -46,4 +46,40 @@ function read(specPath) {
   return spec
 }
 
-module.exports = { apply, read }
+async function applyJSObj(vSpec) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const client = k8s.KubernetesObjectApi.makeApiClient(kc);
+  const spec = vSpec
+  spec.metadata = spec.metadata || {};
+  spec.metadata.annotations = spec.metadata.annotations || {};
+  try {
+    await client.read(spec);
+    // we got the resource, so it exists, so patch it
+    const response = await client.patch(spec);
+    return response.body;
+  } catch (e) {
+    // we did not get the resource, so it does not exist, so create it
+    const response = await client.create(spec);
+    return response.body;
+  }
+}
+
+async function createK8sNamespace(name, labels) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const coreV1 = kc.makeApiClient(k8s.CoreV1Api);
+  const result = await coreV1.createNamespace({
+    apiVersion: 'v1',
+    kind: 'Namespace',
+    metadata: {
+      name,
+      labels,
+    },
+  })
+  return result
+}
+
+module.exports = {
+  apply, read, applyJSObj, createK8sNamespace,
+}
