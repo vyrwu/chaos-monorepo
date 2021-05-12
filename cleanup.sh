@@ -3,28 +3,24 @@
 namespace=$1 || 'production'
 
 echo ""
-echo "Using namespace '${namespace}'"
+echo "Removing microservices"
 echo ""
-
-echo ""
-echo "Installing microservices"
-echo ""
-kubectl apply -f k8s-deployer/k8sYamls -R -n "${namespace}"
+kubectl delete -f k8s-deployer/k8sYamls -R -n "${namespace}"
 
 root="${PWD}"
 
 dirs=(
   "loadgenerator"
   "dixatestplatform/chaos-controller"
+  "k8s-deployer"
 )
 
 for i in "${dirs[@]}"
 do
   echo ""
-  echo "Installing ${i}..."
+  echo "Removing ${i}..."
   echo ""
   cd "${i}/deploy"
-  ./install_k8s.sh "${namespace}"
+  ./cleanup.sh "${namespace}"
   cd "${root}"
 done
-

@@ -144,8 +144,9 @@ const runTest = ({ id, mode }) => new Promise(
         status: 'scheduled',
         mode,
       })
+      const productionNamespace = 'production'
       const { upstreamService, downstreamService, spec } = test
-      const result = await k8sBatchApi.createNamespacedJob('default', {
+      const result = await k8sBatchApi.createNamespacedJob(productionNamespace, {
         apiVersion: 'batch/v1',
         kind: 'Job',
         metadata: {
@@ -166,7 +167,7 @@ const runTest = ({ id, mode }) => new Promise(
             spec: {
               containers: [
                 {
-                  generateName: 'worker',
+                  name: 'worker',
                   image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
                   command: ['node', 'dist/index.js'],
                   args: [`${mode}`, `${upstreamService}`, `${downstreamService}`, `${spec}`],

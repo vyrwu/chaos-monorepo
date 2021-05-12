@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * K8s Deployer - OpenAPI 3.0
- * Service for deploying services onto Kubernetes.
+ * Dixa Testing Platform - OpenAPI 3.0
+ * Platform for executing and monitoring Chaos experiments on the Dixa Test System, supporting the microservice-based system resiliency experimentation.
  *
  * The version of the OpenAPI document: 0.0.1
  * Contact: ano@dixa.com
@@ -606,30 +606,190 @@ export interface IstioNetworkingV1alpha3StringMatchOneOf2 {
      */
     regex: string;
 }
+/**
+ * 
+ * @export
+ * @interface Run
+ */
+export interface Run {
+    /**
+     * 
+     * @type {string}
+     * @memberof Run
+     */
+    id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Run
+     */
+    testId?: string;
+    /**
+     * Status of the Test
+     * @type {string}
+     * @memberof Run
+     */
+    status?: RunStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Run
+     */
+    created_at?: string;
+    /**
+     * 
+     * @type {RunResults}
+     * @memberof Run
+     */
+    results?: RunResults;
+    /**
+     * 
+     * @type {string}
+     * @memberof Run
+     */
+    mode?: RunModeEnum;
+}
 
 /**
- * DefaultApi - axios parameter creator
+    * @export
+    * @enum {string}
+    */
+export enum RunStatusEnum {
+    Started = 'started',
+    Running = 'running',
+    Stopped = 'stopped',
+    Finished = 'finished'
+}
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RunModeEnum {
+    Canary = 'canary',
+    Production = 'production'
+}
+
+/**
+ * 
+ * @export
+ * @interface RunResults
+ */
+export interface RunResults {
+    /**
+     * 
+     * @type {string}
+     * @memberof RunResults
+     */
+    status?: RunResultsStatusEnum;
+    /**
+     * 
+     * @type {RunResultsUpstreamService}
+     * @memberof RunResults
+     */
+    upstreamService?: RunResultsUpstreamService;
+    /**
+     * 
+     * @type {RunResultsUpstreamService}
+     * @memberof RunResults
+     */
+    downstreamService?: RunResultsUpstreamService;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RunResultsStatusEnum {
+    Pass = 'PASS',
+    Fail = 'FAIL'
+}
+
+/**
+ * 
+ * @export
+ * @interface RunResultsUpstreamService
+ */
+export interface RunResultsUpstreamService {
+    /**
+     * 
+     * @type {string}
+     * @memberof RunResultsUpstreamService
+     */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunResultsUpstreamService
+     */
+    logs?: string;
+}
+/**
+ * 
+ * @export
+ * @interface Test
+ */
+export interface Test {
+    /**
+     * 
+     * @type {string}
+     * @memberof Test
+     */
+    id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Test
+     */
+    created_at?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Test
+     */
+    displayName?: string;
+    /**
+     * Description of a tests scenario.
+     * @type {string}
+     * @memberof Test
+     */
+    description?: string;
+    /**
+     * Name of the upstream source service from which traffic flows to the downstreamService.
+     * @type {string}
+     * @memberof Test
+     */
+    upstreamService?: string;
+    /**
+     * Name of the downstream target service to which traffic flows from the upstreamService.
+     * @type {string}
+     * @memberof Test
+     */
+    downstreamService?: string;
+    /**
+     * 
+     * @type {IstioNetworkingV1alpha3HTTPRoute}
+     * @memberof Test
+     */
+    spec?: IstioNetworkingV1alpha3HTTPRoute;
+}
+
+/**
+ * RunsApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+export const RunsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Deploy a service or force it\'s redeployment.
-         * @param {string} name Name of the Service to be deployed
-         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
-         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @summary Add a new Run
+         * @param {Run} run Create a new Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployService: async (name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'name' is not null or undefined
-            assertParamExists('deployService', 'name', name)
-            // verify required parameter 'type' is not null or undefined
-            assertParamExists('deployService', 'type', type)
-            const localVarPath = `/service/{name}/deploy/{type}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)))
-                .replace(`{${"type"}}`, encodeURIComponent(String(type)));
+        addRun: async (run: Run, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'run' is not null or undefined
+            assertParamExists('addRun', 'run', run)
+            const localVarPath = `/run`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -648,7 +808,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(istioNetworkingV1alpha3HTTPRoute, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(run, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -657,12 +817,80 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Redeploys all services to their latest image.
+         * @summary Delete Run
+         * @param {string} id ID of a Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        redeployAll: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/redeployAll`;
+        deleteRun: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteRun', 'id', id)
+            const localVarPath = `/run/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get a single Run
+         * @param {string} id ID of a Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRun: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getRun', 'id', id)
+            const localVarPath = `/run/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all Runs
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRuns: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/runs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -689,99 +917,601 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 };
 
 /**
- * DefaultApi - functional programming interface
+ * RunsApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+export const RunsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RunsApiAxiosParamCreator(configuration)
     return {
         /**
          * 
-         * @summary Deploy a service or force it\'s redeployment.
-         * @param {string} name Name of the Service to be deployed
-         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
-         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @summary Add a new Run
+         * @param {Run} run Create a new Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options);
+        async addRun(run: Run, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addRun(run, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @summary Redeploys all services to their latest image.
+         * @summary Delete Run
+         * @param {string} id ID of a Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async redeployAll(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.redeployAll(options);
+        async deleteRun(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRun(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get a single Run
+         * @param {string} id ID of a Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRun(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Run>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRun(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all Runs
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRuns(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Run>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRuns(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
 
 /**
- * DefaultApi - factory interface
+ * RunsApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DefaultApiFp(configuration)
+export const RunsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RunsApiFp(configuration)
     return {
         /**
          * 
-         * @summary Deploy a service or force it\'s redeployment.
-         * @param {string} name Name of the Service to be deployed
-         * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
-         * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+         * @summary Add a new Run
+         * @param {Run} run Create a new Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any): AxiosPromise<void> {
-            return localVarFp.deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options).then((request) => request(axios, basePath));
+        addRun(run: Run, options?: any): AxiosPromise<void> {
+            return localVarFp.addRun(run, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @summary Redeploys all services to their latest image.
+         * @summary Delete Run
+         * @param {string} id ID of a Run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        redeployAll(options?: any): AxiosPromise<void> {
-            return localVarFp.redeployAll(options).then((request) => request(axios, basePath));
+        deleteRun(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteRun(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a single Run
+         * @param {string} id ID of a Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRun(id: string, options?: any): AxiosPromise<Run> {
+            return localVarFp.getRun(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all Runs
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRuns(options?: any): AxiosPromise<Array<Run>> {
+            return localVarFp.getRuns(options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * DefaultApi - object-oriented interface
+ * RunsApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class RunsApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
+export class RunsApi extends BaseAPI {
     /**
      * 
-     * @summary Deploy a service or force it\'s redeployment.
-     * @param {string} name Name of the Service to be deployed
-     * @param {'chaos-canary' | 'chaos-production'} type Type of the deployment to be made
-     * @param {IstioNetworkingV1alpha3HTTPRoute} [istioNetworkingV1alpha3HTTPRoute] Network Specification for Chaos test
+     * @summary Add a new Run
+     * @param {Run} run Create a new Run
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof RunsApi
      */
-    public deployService(name: string, type: 'chaos-canary' | 'chaos-production', istioNetworkingV1alpha3HTTPRoute?: IstioNetworkingV1alpha3HTTPRoute, options?: any) {
-        return DefaultApiFp(this.configuration).deployService(name, type, istioNetworkingV1alpha3HTTPRoute, options).then((request) => request(this.axios, this.basePath));
+    public addRun(run: Run, options?: any) {
+        return RunsApiFp(this.configuration).addRun(run, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @summary Redeploys all services to their latest image.
+     * @summary Delete Run
+     * @param {string} id ID of a Run
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof RunsApi
      */
-    public redeployAll(options?: any) {
-        return DefaultApiFp(this.configuration).redeployAll(options).then((request) => request(this.axios, this.basePath));
+    public deleteRun(id: string, options?: any) {
+        return RunsApiFp(this.configuration).deleteRun(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a single Run
+     * @param {string} id ID of a Run
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RunsApi
+     */
+    public getRun(id: string, options?: any) {
+        return RunsApiFp(this.configuration).getRun(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all Runs
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RunsApi
+     */
+    public getRuns(options?: any) {
+        return RunsApiFp(this.configuration).getRuns(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * TestsApi - axios parameter creator
+ * @export
+ */
+export const TestsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Add a new Test
+         * @param {Test} test Create a new Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addTest: async (test: Test, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'test' is not null or undefined
+            assertParamExists('addTest', 'test', test)
+            const localVarPath = `/test`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(test, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTest: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteTest', 'id', id)
+            const localVarPath = `/test/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get a single Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTest: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getTest', 'id', id)
+            const localVarPath = `/test/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all tests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTests: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/tests`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Execute test scenarios.
+         * @param {string} id ID of the test to execute
+         * @param {'canary' | 'production'} mode 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTest: async (id: string, mode: 'canary' | 'production', options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('runTest', 'id', id)
+            // verify required parameter 'mode' is not null or undefined
+            assertParamExists('runTest', 'mode', mode)
+            const localVarPath = `/test/{id}/run/{mode}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"mode"}}`, encodeURIComponent(String(mode)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Stops the test scenario immediately, in a Big Red Button fashion.
+         * @param {string} id ID of the test to stop
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopTest: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('stopTest', 'id', id)
+            const localVarPath = `/test/{id}/stop`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * TestsApi - functional programming interface
+ * @export
+ */
+export const TestsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = TestsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Add a new Test
+         * @param {Test} test Create a new Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addTest(test: Test, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addTest(test, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteTest(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTest(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get a single Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTest(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Test>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTest(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all tests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTests(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Test>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTests(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Execute test scenarios.
+         * @param {string} id ID of the test to execute
+         * @param {'canary' | 'production'} mode 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runTest(id: string, mode: 'canary' | 'production', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTest(id, mode, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Stops the test scenario immediately, in a Big Red Button fashion.
+         * @param {string} id ID of the test to stop
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async stopTest(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.stopTest(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * TestsApi - factory interface
+ * @export
+ */
+export const TestsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = TestsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Add a new Test
+         * @param {Test} test Create a new Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addTest(test: Test, options?: any): AxiosPromise<void> {
+            return localVarFp.addTest(test, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTest(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteTest(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a single Test
+         * @param {string} id ID of a Test
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTest(id: string, options?: any): AxiosPromise<Test> {
+            return localVarFp.getTest(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all tests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTests(options?: any): AxiosPromise<Array<Test>> {
+            return localVarFp.getTests(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Execute test scenarios.
+         * @param {string} id ID of the test to execute
+         * @param {'canary' | 'production'} mode 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTest(id: string, mode: 'canary' | 'production', options?: any): AxiosPromise<void> {
+            return localVarFp.runTest(id, mode, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Stops the test scenario immediately, in a Big Red Button fashion.
+         * @param {string} id ID of the test to stop
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopTest(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.stopTest(id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * TestsApi - object-oriented interface
+ * @export
+ * @class TestsApi
+ * @extends {BaseAPI}
+ */
+export class TestsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Add a new Test
+     * @param {Test} test Create a new Test
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public addTest(test: Test, options?: any) {
+        return TestsApiFp(this.configuration).addTest(test, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Test
+     * @param {string} id ID of a Test
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public deleteTest(id: string, options?: any) {
+        return TestsApiFp(this.configuration).deleteTest(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a single Test
+     * @param {string} id ID of a Test
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public getTest(id: string, options?: any) {
+        return TestsApiFp(this.configuration).getTest(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all tests
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public getTests(options?: any) {
+        return TestsApiFp(this.configuration).getTests(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Execute test scenarios.
+     * @param {string} id ID of the test to execute
+     * @param {'canary' | 'production'} mode 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public runTest(id: string, mode: 'canary' | 'production', options?: any) {
+        return TestsApiFp(this.configuration).runTest(id, mode, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Stops the test scenario immediately, in a Big Red Button fashion.
+     * @param {string} id ID of the test to stop
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public stopTest(id: string, options?: any) {
+        return TestsApiFp(this.configuration).stopTest(id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

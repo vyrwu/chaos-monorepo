@@ -33,21 +33,20 @@ const deployChaosCanaryCluster = async (runId) => {
       return chaosDeploySpecs
     }),
   )
-  const result = JSON.stringify(specs)
-  // const result = await Promise.all(
-  //   specs.map(async (spec) => {
-  //     const resultApply = await applyJSObj(spec)
-  //     return resultApply
-  //   }),
-  // )
+  // const result = JSON.stringify(specs)
+  const result = await Promise.all(
+    specs.map(async (spec) => {
+      const resultApply = await applyJSObj(spec)
+      return resultApply
+    }),
+  )
   return { namespace: namespaceResult, services: result }
 }
 
-const addChaosCanaryRouting = async (upstreamName, chaosNamespace) => {
-  const upstreamNamespace = 'production'
+const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstreamNamespace) => {
   const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
   const upstreamVirtualServiceSpec = read(`${k8sYamls}/${upstreamName}/virtual-service.yaml`)
-  const chaosCanaryServicefqdn = `${upstreamName}.${chaosNamespace}.svc.cluster.local`
+  const chaosCanaryServicefqdn = `${upstreamName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
   upstreamVirtualServiceSpec.spec.hosts = [
     ...upstreamVirtualServiceSpec.spec.hosts,
@@ -56,7 +55,7 @@ const addChaosCanaryRouting = async (upstreamName, chaosNamespace) => {
   const routeIndex = upstreamVirtualServiceSpec.spec.http
     .findIndex(route => route.name === upstreamNamespace)
   if (routeIndex === -1) {
-    throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${upstreamVirtualServiceSpec.metadata.name}'`}
+    throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${upstreamVirtualServiceSpec.metadata.name}'` }
   }
   // TODO: This can come from the client.
   const routingConf = {
@@ -71,13 +70,12 @@ const addChaosCanaryRouting = async (upstreamName, chaosNamespace) => {
     ...upstreamVirtualServiceSpec.spec.http[routeIndex],
     ...routingConf,
   ]
-  // const result = await applyJSObj(upstreamVirtualServiceSpec)
-  const result = JSON.stringify(upstreamVirtualServiceSpec)
+  const result = await applyJSObj(upstreamVirtualServiceSpec)
+  // const result = JSON.stringify(upstreamVirtualServiceSpec)
   return result
 }
 
-const addFailureToService = (service, namespace, faultSpec) => {
-  const upstreamNamespace = 'production'
+const addFailureToService = async (service, namespace, upstreamNamespace, faultSpec) => {
   const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
   const vServiceSpec = read(`${k8sYamls}/${service}/virtual-service.yaml`)
   vServiceSpec.metadata.namespace = namespace
@@ -90,8 +88,8 @@ const addFailureToService = (service, namespace, faultSpec) => {
     ...vServiceSpec.spec.http[routeIndex],
     ...faultSpec,
   ]
-  // const result = await applyJSObj(vServiceSpec)
-  const result = JSON.stringify(vServiceSpec)
+  const result = await applyJSObj(vServiceSpec)
+  // const result = JSON.stringify(vServiceSpec)
   return result
 }
 

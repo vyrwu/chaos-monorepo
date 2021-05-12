@@ -22,16 +22,16 @@ docker run -v $(PWD):/var openapitools/openapi-generator-cli:latest generate \
 docker run -v $(PWD):/var openapitools/openapi-generator-cli:latest generate \
     -i "var/${FILE}" \
     -g "${CLIENT_GENERATOR}" \
-    -o "var/k8s-deployer"
+    -o "var/chaos-controller"
 
-rsync -a k8s-deployer ../ts-api/src/
-rm -rf k8s-deployer
+rsync -a chaos-controller ../../ts-api/src/
+rm -rf chaos-controller
 
 echo ""
 echo "UPDATING CLIENT PACKAGE"
 echo ""
 
-cd "../ts-api"
+cd "../../ts-api"
 npm version minor > /dev/null
 npm i
 npm publish

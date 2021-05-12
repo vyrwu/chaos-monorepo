@@ -8,8 +8,8 @@
 
 const Controller = require('./Controller');
 const service = require('../services/DefaultService');
-const deployService = async (request, response) => {
-  await Controller.handleRequest(request, response, service.deployService);
+const deployChaosTest = async (request, response) => {
+  await Controller.handleRequest(request, response, service.deployChaosTest);
 };
 
 const redeployAll = async (request, response) => {
@@ -18,6 +18,6 @@ const redeployAll = async (request, response) => {
 
 
 module.exports = {
-  deployService,
+  deployChaosTest,
   redeployAll,
 };

@@ -1,14 +1,14 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: conversation-service
+  name: k8s-deployer
 spec:
   hosts:
-  - conversation-service.default.svc.cluster.local
+  - k8s-deployer
   http:
   - route:
     - destination:
-        host: conversation-service.default.svc.cluster.local
+        host: k8s-deployer
     retries:
       attempts: 3
       perTryTimeout: 2s

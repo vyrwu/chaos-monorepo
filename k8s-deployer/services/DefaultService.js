@@ -1,9 +1,15 @@
 /* eslint-disable no-unused-vars */
 const fs = require('fs')
 const path = require('path')
+const { ChaosController } = require('@vyrwu/ts-api')
 const { apply } = require('./util');
 const Service = require('./Service');
-const { deployChaosCanaryCluster, addChaosRouting, addChaosDestinationSubset } = require('./ops')
+const {
+  deployChaosCanaryCluster,
+  addChaosCanaryRouting,
+  addFailureToService,
+} = require('./ops')
+
 /**
 * Redeploys all services to their latest image.
 *
@@ -26,7 +32,8 @@ const redeployAll = () => new Promise(
               }
               Promise.all(yamls.map(async (yamlName) => {
                 try {
-                  await apply(`${serviceDirPath}/${yamlName}`)
+                  const productionNamespace = 'production'
+                  await apply(`${serviceDirPath}/${yamlName}`, productionNamespace)
                 } catch (e) {
                   console.log(e)
                 }
@@ -52,19 +59,29 @@ const redeployAll = () => new Promise(
 *
 * no response value expected for this operation
 * */
-const deployService = ({ name, type, spec }) => new Promise(
+const deployChaosTest = ({ chaosRun }) => new Promise(
   async (resolve, reject) => {
     try {
-      if (type !== 'chaos-canary') {
-        throw { message: `Unsupported deployment type '${type}'`, code: 400 }
+      const { mode, runId } = chaosRun
+      if (mode !== 'canary') {
+        throw { message: `Unsupported deployment mode '${mode}'`, code: 400 }
       }
-      const defaultNamespace = 'default'
-      const result = await Promise.all([
-        deployChaosCanaryCluster(name, defaultNamespace),
-        addChaosRouting(name, defaultNamespace, spec),
-        addChaosDestinationSubset(name, defaultNamespace),
-      ])
-      console.log(result)
+      // get the Run by ID => testId
+      const runsAPi = new ChaosController.RunsApi()
+      const runResponse = await runsAPi.getRun(runId)
+      const { testId } = runResponse.data
+      // get Test by ID => upstream, downstream, spec
+      const testApi = new ChaosController.TestsApi()
+      const testResponse = await testApi.getTest(testId)
+      const { upstreamService, downstreamService, spec } = testResponse.data
+
+      // create chaos canary
+      const { namespace, services } = await deployChaosCanaryCluster(runId)
+      console.log(`const { namespace, services } = await deployChaosCanaryCluster(runId)\n${{ namespace, services }}`)
+      const result = await addFailureToService(downstreamService, 'production', namespace.body.metadata.name, spec)
+      console.log(`const result = await addFailureToService(downstreamService, 'production', namespace.body.metadata.name)\n${{ result }}`)
+      const routingResponse = await addChaosCanaryRouting(upstreamService, namespace.body.metadata.name)
+      console.log(`const routingResponse = await addChaosCanaryRouting(upstreamService, namespace.body.metadata.name)\n${{ routingResponse }}`)
       resolve(Service.successResponse('Deployment was successful.'));
     } catch (e) {
       reject(Service.rejectResponse(
@@ -77,5 +94,5 @@ const deployService = ({ name, type, spec }) => new Promise(
 
 module.exports = {
   redeployAll,
-  deployService,
+  deployChaosTest,
 };

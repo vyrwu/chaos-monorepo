@@ -1,18 +1,17 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: chaos-worker
+  name: k8s-deployer
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: default
-  name: chaos-test-runner
+  name: deployer
 rules:
 - apiGroups: [""]
-  resources: ["deployments"]
+  resources: ["*"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
 ---
@@ -20,13 +19,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: run-chaos-tests
-  namespace: default
+  name: make-deployments
 subjects:
 - kind: ServiceAccount
-  name: chaos-worker
-  namespace: default
+  name: k8s-deployer
 roleRef:
   kind: Role
-  name: chaos-test-runner
+  name: deployer
   apiGroup: rbac.authorization.k8s.io

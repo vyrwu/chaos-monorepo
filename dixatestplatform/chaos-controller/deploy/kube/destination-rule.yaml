@@ -3,4 +3,4 @@ kind: DestinationRule
 metadata:
   name: chaos-controller
 spec:
-  host: chaos-controller.default.svc.cluster.local
+  host: chaos-controller

@@ -10,14 +10,23 @@ const { promisify } = require('util')
  * @param specPath File system path to a YAML Kubernetes spec.
  * @return Array of resources created
  */
-async function apply(specPath) {
+async function apply(specPath, namespace) {
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
   const client = k8s.KubernetesObjectApi.makeApiClient(kc);
   const fsReadFileP = promisify(fs.readFile);
   const specString = await fsReadFileP(specPath, 'utf8');
   const specs = yaml.safeLoadAll(specString);
-  const validSpecs = specs.filter((s) => s && s.kind && s.metadata);
+  const validSpecs = specs
+    .filter((s) => s && s.kind && s.metadata)
+    .map((spec) => {
+      if (!namespace) {
+        return spec
+      }
+      const namespacedSpec = spec
+      namespacedSpec.metadata.namespace = namespace
+      return namespacedSpec
+    });
   const created = await Promise.all(
     validSpecs.map(async (vSpec) => {
       const spec = vSpec

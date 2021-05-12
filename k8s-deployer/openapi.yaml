@@ -16,35 +16,31 @@ paths:
       responses:
         "200":
           description: Successfuly operation
-  /service/{name}/deploy/{type}:
+  /deploy/chaosTest:
     post:
-      summary: Deploy a service or force it's redeployment.
-      operationId: deployService
-      parameters:
-        - in: path
-          name: name
-          schema:
-            type: string
-          required: true
-          description: Name of the Service to be deployed
-          example: "conversation-service"
-        - in: path
-          name: type
-          schema:
-            type: string
-            enum:
-              - chaos-canary
-              - chaos-production
-          required: true
-          description: Type of the deployment to be made
+      summary: Deploy a Chaos Test per its specification.
+      operationId: deployChaosTest
       requestBody:
-        description: Network Specification for Chaos test 
+        description: Specification for the Chaos Test to be deployed 
         content:
           application/json:
-            schema:
-              $ref: "./openapi-istio.json#/components/schemas/istio.networking.v1alpha3.HTTPRoute"
+              schema:
+                $ref: "#/components/schemas/ChaosRun"
       responses:
         "200":
           description: Successful operation
         "404":
-          description: Deployment not found
+          description: Test not found
+components:
+  schemas:
+    ChaosRun:
+      properties:
+        runId:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          description: Mode of the deployment to be made
+          enum:
+              - canary
+              - production

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: conversation-service
+  name: k8s-deployer
 spec:
   selector:
-    dixa-app: conversation-service
+    dixa-app: k8s-deployer
   ports:
     - port: 80
       targetPort: 8080

@@ -33,7 +33,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-buildAndDeploy "chaos-controller" "${npm_token}"
+buildAndDeploy "k8s-deployer" "${npm_token}"
 
 # kick the deployment to re-pull image
-kubectl patch deployment chaos-controller -n production -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
+kubectl patch deployment k8s-deployer -n production -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"

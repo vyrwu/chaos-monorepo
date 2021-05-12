@@ -5,7 +5,7 @@ metadata:
 spec:
   hosts:
   - conversation-service
-  - conversation-service.chaos-canary.svc.cluster.local
+  # - conversation-service.chaos-canary.svc.cluster.local
   http:
   - name: 'production'
     route:
@@ -16,10 +16,11 @@ spec:
       attempts: 3
       perTryTimeout: 2s
       retryOn: 5xx
-    mirror:
-      host: conversation-service.chaos-canary.svc.cluster.local
-    mirrorPercentage: 
-      value: 100
+    # mirror:
+    #   host: conversation-service.chaos-canary.svc.cluster.local
+    # mirrorPercentage: 
+    #   value: 100
+
     # fault:
     #   delay:
     #     percentage:

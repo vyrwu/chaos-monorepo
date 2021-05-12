@@ -4,11 +4,11 @@ metadata:
   name: chaos-controller
 spec:
   hosts:
-  - chaos-controller.default.svc.cluster.local
+  - chaos-controller
   http:
   - route:
     - destination:
-        host: chaos-controller.default.svc.cluster.local
+        host: chaos-controller
     retries:
       attempts: 3
       perTryTimeout: 2s

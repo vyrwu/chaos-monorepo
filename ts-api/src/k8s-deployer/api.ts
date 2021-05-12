@@ -21,6 +21,35 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
+/**
+ * 
+ * @export
+ * @interface ChaosRun
+ */
+export interface ChaosRun {
+    /**
+     * 
+     * @type {string}
+     * @memberof ChaosRun
+     */
+    runId?: string;
+    /**
+     * Mode of the deployment to be made
+     * @type {string}
+     * @memberof ChaosRun
+     */
+    mode?: ChaosRunModeEnum;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum ChaosRunModeEnum {
+    Canary = 'canary',
+    Production = 'production'
+}
+
 
 /**
  * DefaultApi - axios parameter creator
@@ -28,6 +57,40 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Deploy a Chaos Test per its specification.
+         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployChaosTest: async (chaosRun?: ChaosRun, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/deploy/chaosTest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(chaosRun, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Redeploys all services to their latest image.
@@ -70,6 +133,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Deploy a Chaos Test per its specification.
+         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployChaosTest(chaosRun?: ChaosRun, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployChaosTest(chaosRun, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Redeploys all services to their latest image.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -90,6 +164,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Deploy a Chaos Test per its specification.
+         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployChaosTest(chaosRun?: ChaosRun, options?: any): AxiosPromise<void> {
+            return localVarFp.deployChaosTest(chaosRun, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Redeploys all services to their latest image.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -107,6 +191,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Deploy a Chaos Test per its specification.
+     * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployChaosTest(chaosRun?: ChaosRun, options?: any) {
+        return DefaultApiFp(this.configuration).deployChaosTest(chaosRun, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Redeploys all services to their latest image.

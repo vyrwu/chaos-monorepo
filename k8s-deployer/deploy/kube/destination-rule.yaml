@@ -1,6 +1,6 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: conversation-service
+  name: k8s-deployer
 spec:
-  host: conversation-service.default.svc.cluster.local
+  host: k8s-deployer

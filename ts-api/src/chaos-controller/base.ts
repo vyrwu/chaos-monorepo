@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * K8s Deployer - OpenAPI 3.0
- * Service for deploying services onto Kubernetes.
+ * Dixa Testing Platform - OpenAPI 3.0
+ * Platform for executing and monitoring Chaos experiments on the Dixa Test System, supporting the microservice-based system resiliency experimentation.
  *
  * The version of the OpenAPI document: 0.0.1
  * Contact: ano@dixa.com
@@ -18,7 +18,7 @@ import { Configuration } from "./configuration";
 // @ts-ignore
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 
-export const BASE_PATH = "http://k8s-deployer".replace(/\/+$/, "");
+export const BASE_PATH = "http://chaos-controller/chaos".replace(/\/+$/, "");
 
 /**
  *

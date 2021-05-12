@@ -1,6 +1,6 @@
 openapi: 3.0.2
 servers:
-  - url: http://dixatestplatform/chaos
+  - url: http://chaos-controller/chaos
 info:
   description: |-
     Platform for executing and monitoring Chaos experiments on the Dixa Test System, supporting the microservice-based system resiliency experimentation.

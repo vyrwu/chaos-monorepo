@@ -1,6 +1,6 @@
 {
   "name": "dixa-testing-platform-openapi-3-0",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Platform for executing and monitoring Chaos experiments on the Dixa Test System, supporting the microservice-based system resiliency experimentation.",
   "main": "index.js",
   "scripts": {
