@@ -42,7 +42,7 @@ const addTest = ({ test }) => new Promise(
         throw { message: `Conversation with ID '${test.id}' already exists`, status: 400 }
       }
       resolve(Service.successResponse({
-        newTest,
+        ...newTest,
       }));
     } catch (e) {
       reject(Service.rejectResponse(
@@ -134,26 +134,37 @@ const getTests = () => new Promise(
 const runTest = ({ id, mode }) => new Promise(
   async (resolve, reject) => {
     try {
+      logger.info('runTest', { id, mode })
       const test = await getTest({ id })
-      if (test.code === 500) {
+      if (test.code !== 200) {
         throw { message: test.error, status: test.code }
       }
-      logger.info('runTest', { id, mode })
+      const {
+        id: testId,
+        upstreamService,
+        downstreamService,
+        spec,
+      } = test.payload
       const newRun = await RunsService.addRun({
-        testId: id,
-        status: 'scheduled',
-        mode,
+        run: {
+          testId,
+          status: 'scheduled',
+          mode,
+        },
       })
+      if (newRun.code !== 200) {
+        throw { message: test.error, status: test.code }
+      }
+      const { id: runId } = newRun.payload
       const productionNamespace = 'production'
-      const { upstreamService, downstreamService, spec } = test
       const result = await k8sBatchApi.createNamespacedJob(productionNamespace, {
         apiVersion: 'batch/v1',
         kind: 'Job',
         metadata: {
-          generateName: 'chaos-run-',
+          name: `chaos-run-${runId.slice(0, 6)}`, // a bit more predictable yet still random id
           labels: {
-            runId: newRun.id,
-            testId: id,
+            runId,
+            testId,
             testMode: mode,
           },
         },

@@ -26,6 +26,7 @@
     "js-yaml": "^3.14.1",
     "ono": "^5.0.1",
     "openapi-sampler": "^1.0.0-beta.15",
+    "shelljs": "^0.8.4",
     "swagger-ui-express": "^4.0.2",
     "util": "^0.12.3",
     "winston": "^3.2.1"

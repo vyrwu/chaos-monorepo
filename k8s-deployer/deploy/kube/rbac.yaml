@@ -6,24 +6,76 @@ metadata:
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: deployer
+  name: k8s-deployer
 rules:
-- apiGroups: [""]
-  resources: ["*"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["namespaces", "services", "pods"]
+    verbs: ["get", "list", "create", "delete", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "create", "delete", "patch"]
+  - apiGroups: ["networking.istio.io"]
+    resources: ["virtualservices", "destinationrules"]
+    verbs: ["get", "list", "create", "delete", "patch"]
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: make-deployments
+  name: administer-cluster
 subjects:
 - kind: ServiceAccount
   name: k8s-deployer
+  namespace: production
 roleRef:
-  kind: Role
-  name: deployer
   apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k8s-deployer
+
+# ---
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: administer-istio
+# subjects:
+# - kind: ServiceAccount
+#   name: k8s-deployer
+#   namespace: production
+# roleRef:
+#   kind: ClusterRole
+#   name: istiod-istio-system
+#   apiGroup: rbac.authorization.k8s.io
+
+# ---
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: administer-namespaces
+# subjects:
+# - kind: ServiceAccount
+#   name: k8s-deployer
+#   namespace: production
+# roleRef:
+#   kind: ClusterRole
+#   name: system:controller:namespace-controller
+#   apiGroup: rbac.authorization.k8s.io
+
+# ---
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: administer-cluster
+# subjects:
+# - kind: ServiceAccount
+#   name: k8s-deployer
+#   namespace: production
+# roleRef:
+#   kind: ClusterRole
+#   name: system:controller:namespace-controller
+#   apiGroup: rbac.authorization.k8s.io

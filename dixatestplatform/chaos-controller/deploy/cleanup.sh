@@ -1,3 +1,5 @@
 #!/bin/bash
 
-kubectl delete -n default -f kube/
+namespace=$1
+
+kubectl delete -n "${namespace}" -f kube/

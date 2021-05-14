@@ -1,7 +1,16 @@
 const k8s = require('@kubernetes/client-node')
+const shell = require('shelljs')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const { promisify } = require('util')
+
+const applySpec = async (spec) => {
+  const apply = shell.exec(`echo "${yaml.dump(spec)}" | kubectl apply -f -`)
+  if (apply.code !== 0) {
+    throw { message: `'kubectl apply -f ...' exitted with '${apply.code}': ${apply.stderr}`, code: 500 }
+  }
+  return spec
+}
 
 /**
  * Replicate the functionality of `kubectl apply`.  That is, create the resources
@@ -10,10 +19,7 @@ const { promisify } = require('util')
  * @param specPath File system path to a YAML Kubernetes spec.
  * @return Array of resources created
  */
-async function apply(specPath, namespace) {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
-  const client = k8s.KubernetesObjectApi.makeApiClient(kc);
+async function applyFile(specPath, namespace) {
   const fsReadFileP = promisify(fs.readFile);
   const specString = await fsReadFileP(specPath, 'utf8');
   const specs = yaml.safeLoadAll(specString);
@@ -34,16 +40,7 @@ async function apply(specPath, namespace) {
       spec.metadata.annotations = spec.metadata.annotations || {};
       delete spec.metadata.annotations['kubectl.kubernetes.io/last-applied-configuration'];
       spec.metadata.annotations['kubectl.kubernetes.io/last-applied-configuration'] = JSON.stringify(spec);
-      try {
-        await client.read(spec);
-        // we got the resource, so it exists, so patch it
-        const response = await client.patch(spec);
-        return response.body;
-      } catch (e) {
-        // we did not get the resource, so it does not exist, so create it
-        const response = await client.create(spec);
-        return response.body;
-      }
+      await applySpec(spec)
     }),
   )
   return created;
@@ -53,25 +50,6 @@ function read(specPath) {
   const specString = fs.readFileSync(specPath, 'utf8');
   const spec = yaml.safeLoad(specString);
   return spec
-}
-
-async function applyJSObj(vSpec) {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
-  const client = k8s.KubernetesObjectApi.makeApiClient(kc);
-  const spec = vSpec
-  spec.metadata = spec.metadata || {};
-  spec.metadata.annotations = spec.metadata.annotations || {};
-  try {
-    await client.read(spec);
-    // we got the resource, so it exists, so patch it
-    const response = await client.patch(spec);
-    return response.body;
-  } catch (e) {
-    // we did not get the resource, so it does not exist, so create it
-    const response = await client.create(spec);
-    return response.body;
-  }
 }
 
 async function createK8sNamespace(name, labels) {
@@ -90,5 +68,5 @@ async function createK8sNamespace(name, labels) {
 }
 
 module.exports = {
-  apply, read, applyJSObj, createK8sNamespace,
+  applyFile, read, applySpec, createK8sNamespace,
 }

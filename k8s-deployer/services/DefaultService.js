@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ChaosController } = require('@vyrwu/ts-api')
-const { apply } = require('./util');
+const { applyFile } = require('./util');
 const Service = require('./Service');
 const {
   deployChaosCanaryCluster,
@@ -33,7 +33,7 @@ const redeployAll = () => new Promise(
               Promise.all(yamls.map(async (yamlName) => {
                 try {
                   const productionNamespace = 'production'
-                  await apply(`${serviceDirPath}/${yamlName}`, productionNamespace)
+                  await applyFile(`${serviceDirPath}/${yamlName}`, productionNamespace)
                 } catch (e) {
                   console.log(e)
                 }
@@ -44,7 +44,9 @@ const redeployAll = () => new Promise(
           }
         })
       })
-      resolve(Service.successResponse('Redeployment was successful.'));
+      resolve(Service.successResponse(JSON.stringify({
+        result: 'Redeployment started. It may take a while before changes are applied.',
+      }, null, 2)));
     } catch (e) {
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
@@ -73,17 +75,33 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
       // get Test by ID => upstream, downstream, spec
       const testApi = new ChaosController.TestsApi()
       const testResponse = await testApi.getTest(testId)
+
+      // const test = JSON.parse('{"displayName": "test", "upstreamService": "conversation-service", "downstreamService": "message-service", "spec": {"fault": {"abort": {"percentage": {"value": 100}, "httpStatus": 500}}}}')
+      // const { upstreamService, downstreamService, spec } = test
       const { upstreamService, downstreamService, spec } = testResponse.data
 
       // create chaos canary
-      const { namespace, services } = await deployChaosCanaryCluster(runId)
-      console.log(`const { namespace, services } = await deployChaosCanaryCluster(runId)\n${{ namespace, services }}`)
-      const result = await addFailureToService(downstreamService, 'production', namespace.body.metadata.name, spec)
-      console.log(`const result = await addFailureToService(downstreamService, 'production', namespace.body.metadata.name)\n${{ result }}`)
-      const routingResponse = await addChaosCanaryRouting(upstreamService, namespace.body.metadata.name)
-      console.log(`const routingResponse = await addChaosCanaryRouting(upstreamService, namespace.body.metadata.name)\n${{ routingResponse }}`)
-      resolve(Service.successResponse('Deployment was successful.'));
+      const { namespace } = await deployChaosCanaryCluster(runId)
+      const productionNamespace = 'production'
+      const chaosNamespace = namespace.body.metadata.name
+      await addFailureToService(
+        downstreamService,
+        productionNamespace,
+        chaosNamespace,
+        spec,
+      )
+      await addChaosCanaryRouting(
+        upstreamService,
+        productionNamespace,
+        chaosNamespace,
+      )
+      resolve(Service.successResponse(JSON.stringify({
+        result: 'Chaos Test has started!',
+        runId,
+        namespace: mode === 'canary' ? chaosNamespace : productionNamespace,
+      }, null, 2)));
     } catch (e) {
+      console.log(e)
       reject(Service.rejectResponse(
         e.message || 'Internal Server Error',
         e.status || 500,

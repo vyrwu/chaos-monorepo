@@ -23,10 +23,10 @@ const addRun = ({ run }) => new Promise(
         ...run,
       }
       if (runsDao.writeItem(newRun) === badRequest) {
-        throw { message: `Run with ID '${run.id}' already exists`, status: 400 }
+        throw { message: `Run with ID '${newRun.id}' already exists`, status: 400 }
       }
       resolve(Service.successResponse({
-        newRun,
+        ...newRun,
       }));
     } catch (e) {
       reject(Service.rejectResponse(

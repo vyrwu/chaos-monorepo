@@ -1,46 +1,60 @@
+const shell = require('shelljs')
 const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
-const { read, applyJSObj, createK8sNamespace } = require('./util')
+const { read, applySpec, createK8sNamespace } = require('./util')
+
+const patchYaml = (kind, chaosNamespaceName) => {
+  const patches = {
+    Deployment: (spec) => {
+      const cDeploy = spec
+      const chaosCanaryLabel = 'chaos-canary'
+      const deploymentType = 'deployment-type'
+      cDeploy.metadata.labels[deploymentType] = chaosCanaryLabel
+      cDeploy.spec.selector.matchLabels[deploymentType] = chaosCanaryLabel
+      cDeploy.spec.template.metadata.labels[deploymentType] = chaosCanaryLabel
+      cDeploy.spec.template.metadata.namespace = chaosNamespaceName
+      cDeploy.metadata.namespace = chaosNamespaceName
+      return cDeploy
+    },
+    Default: (spec) => {
+      const cSpec = spec
+      cSpec.metadata.namespace = chaosNamespaceName
+      return cSpec
+    },
+  }
+  return patches[kind] || patches.Default
+}
 
 const deployChaosCanaryCluster = async (runId) => {
   // deploy new namespace (runId)
-  const chaosNamespaceName = `chaos-test-${runId}`
+  const chaosNamespaceName = `chaos-test-${runId.slice(0, 6)}`
   const namespaceResult = await createK8sNamespace(chaosNamespaceName, {
     'istio-injection': 'enabled',
+    testType: 'chaos',
+    runId,
   })
-  // deploy canary cluster
-  const applyChaosPatches = (deploy) => {
-    const cDeploy = deploy
-    const chaosCanaryLabel = 'chaos-canary'
-    const deploymentType = 'deployment-type'
-    cDeploy.metadata.labels[deploymentType] = chaosCanaryLabel
-    cDeploy.spec.selector.matchLabels[deploymentType] = chaosCanaryLabel
-    cDeploy.spec.template.metadata.labels[deploymentType] = chaosCanaryLabel
-    cDeploy.spec.template.metadata.namespace = chaosNamespaceName
-    cDeploy.metadata.namespace = chaosNamespaceName
-    return cDeploy
-  }
   // get all specs as objects
-  const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
+  const rootDir = path.resolve(path.dirname(__filename), '..')
+  const k8sYamls = `${rootDir}/k8sYamls`
   const serviceDirs = await fs.promises.readdir(k8sYamls)
-  const specs = await Promise.all(
+  const specs = (await Promise.all(
     serviceDirs.map(async (dir) => {
-      const chaosDeploySpecs = (await fs.promises.readdir(dir))
-        .map(file => yaml.safeLoad(file))
+      const serviceDir = `${k8sYamls}/${dir}`
+      const chaosDeploySpecs = (await fs.promises.readdir(serviceDir))
+        .map(file => read(`${serviceDir}/${file}`))
         .filter(rawYaml => rawYaml && rawYaml.kind && rawYaml.metadata)
-        .map(spec => applyChaosPatches(spec))
+        .map(spec => patchYaml(spec.kind, chaosNamespaceName)(spec))
       return chaosDeploySpecs
     }),
-  )
-  // const result = JSON.stringify(specs)
-  const result = await Promise.all(
+  )).flat()
+  const clusterResult = await Promise.all(
     specs.map(async (spec) => {
-      const resultApply = await applyJSObj(spec)
+      const resultApply = await applySpec(spec)
       return resultApply
     }),
   )
-  return { namespace: namespaceResult, services: result }
+  return { namespace: namespaceResult, cluster: clusterResult }
 }
 
 const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstreamNamespace) => {
@@ -57,40 +71,41 @@ const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstream
   if (routeIndex === -1) {
     throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${upstreamVirtualServiceSpec.metadata.name}'` }
   }
-  // TODO: This can come from the client.
   const routingConf = {
     mirror: {
       host: chaosCanaryServicefqdn,
     },
     mirrorPercentage: {
-      value: 100,
+      value: 20,
     },
   }
-  upstreamVirtualServiceSpec.spec.http[routeIndex] = [
+  upstreamVirtualServiceSpec.spec.http[routeIndex] = {
     ...upstreamVirtualServiceSpec.spec.http[routeIndex],
     ...routingConf,
-  ]
-  const result = await applyJSObj(upstreamVirtualServiceSpec)
-  // const result = JSON.stringify(upstreamVirtualServiceSpec)
+  }
+
+  const result = await applySpec(upstreamVirtualServiceSpec)
   return result
 }
 
-const addFailureToService = async (service, namespace, upstreamNamespace, faultSpec) => {
+const addFailureToService = async (service, upstreamNamespace, chaosNamespace, faultSpec) => {
   const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
   const vServiceSpec = read(`${k8sYamls}/${service}/virtual-service.yaml`)
-  vServiceSpec.metadata.namespace = namespace
   const routeIndex = vServiceSpec.spec.http
     .findIndex(route => route.name === upstreamNamespace)
   if (routeIndex === -1) {
     throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${vServiceSpec.metadata.name}'` }
   }
-  vServiceSpec.spec.http[routeIndex] = [
+  vServiceSpec.metadata.namespace = chaosNamespace
+  vServiceSpec.spec.http[routeIndex] = {
     ...vServiceSpec.spec.http[routeIndex],
     ...faultSpec,
-  ]
-  const result = await applyJSObj(vServiceSpec)
-  // const result = JSON.stringify(vServiceSpec)
-  return result
+  }
+  const apply = shell.exec(`echo "${yaml.dump(vServiceSpec)}" | kubectl apply -f -`)
+  if (apply.code !== 0) {
+    throw { message: `'kubectl apply -f ...' exitted with '${apply.code}': ${apply.stderr}`, code: 500 }
+  }
+  return vServiceSpec
 }
 
 module.exports = {
