@@ -25,6 +25,15 @@ const InMemoryDao = () => {
       items = [...items, newItem]
       return Responses.ok
     },
+    patchItem: (id, patch) => {
+      const i = items.findIndex(item => item.id === id)
+      if (i === -1) {
+        return Responses.notFound
+      }
+      const patched = { id, ...items[i], ...patch }
+      items[i] = patched
+      return Responses.ok
+    },
     putItem: (id, newItem) => {
       const i = items.findIndex(item => item.id === id)
       const replacement = { id, ...newItem }

@@ -1,0 +1,12 @@
+- Make HTTP PUT method on chaos-controller to edit test status DONE
+- Report status of Chaos Tests to chaos-controller DONE
+- Implement chaos-worker in canary modes
+- Add support for 'production' mode
+- Fix high vulnerabilities
+- Add support for 'canary-mirror' and 'canary-split' modes
+- Consider giving developers few more knobs to turn
+- Revise test spec to accept additional modes: canary-mirror/canary-split/production-split
+- Update Run log when creating resources etc. 
+- * Prep demo
+- * Implement cleanup for chaos Tests
+- * Refactor

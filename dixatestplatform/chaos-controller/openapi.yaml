@@ -208,6 +208,33 @@ paths:
           description: Successful operation
         "404":
           description: Run not found
+    patch:
+      tags:
+        - runs
+      summary: Patch Run
+      operationId: patchRun
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Run to patch
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+        "404":
+          description: No such Run found
+      requestBody:
+        description: Patch to be applied to the Run
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Run"
 components:
   schemas:
     Test:
@@ -236,8 +263,12 @@ components:
           example: message-service
         spec:
           type: object
-          description: Istio standard HTTPRoute definition for specifying the types of perturbations to be injected. 
-          $ref: "./openapi-istio.json#/components/schemas/istio.networking.v1alpha3.HTTPRoute"
+          description: Chaos Test specification, defining perturbations to be injected into the system.
+          properties:
+            fault:
+              type: object
+              description: Istio standard HTTPFaultInjection definition for specifying the types of perturbations to be injected. 
+              $ref: "./openapi-istio.json#/components/schemas/istio.networking.v1alpha3.HTTPFaultInjection"
     Tests:
       type: array
       items:
@@ -256,10 +287,10 @@ components:
           type: string
           description: Status of the Test
           enum:
-            - started
+            - scheduled
             - running
             - stopped
-            - finished
+            - completed
         created_at:
           type: string
           format: date-time

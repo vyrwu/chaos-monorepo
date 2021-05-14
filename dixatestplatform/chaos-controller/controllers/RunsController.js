@@ -24,10 +24,15 @@ const getRuns = async (request, response) => {
   await Controller.handleRequest(request, response, service.getRuns);
 };
 
+const patchRun = async (request, response) => {
+  await Controller.handleRequest(request, response, service.patchRun);
+};
+
 
 module.exports = {
   addRun,
   deleteRun,
   getRun,
   getRuns,
+  patchRun,
 };

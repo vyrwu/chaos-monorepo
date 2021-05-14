@@ -109,9 +109,30 @@ const getRuns = () => new Promise(
   },
 );
 
+const patchRun = ({ id, run }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      logger.info('updateRun: {}')
+      const patchResult = runsDao.patchItem(id, run)
+      if (patchResult === runsDao.Responses.notFound) {
+        throw { message: `Patch '${id}' not found.`, code: 404 }
+      }
+      resolve(Service.successResponse({
+        ...runsDao.readItemById(id),
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Internal Server Error',
+        e.status || 500,
+      ));
+    }
+  },
+)
+
 module.exports = {
   addRun,
   deleteRun,
   getRun,
   getRuns,
+  patchRun,
 };

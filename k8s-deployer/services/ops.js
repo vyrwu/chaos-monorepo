@@ -28,7 +28,7 @@ const patchYaml = (kind, chaosNamespaceName) => {
 
 const deployChaosCanaryCluster = async (runId) => {
   // deploy new namespace (runId)
-  const chaosNamespaceName = `chaos-test-${runId.slice(0, 6)}`
+  const chaosNamespaceName = `chaos-test-${runId.slice(runId.length - 6, runId.length)}`
   const namespaceResult = await createK8sNamespace(chaosNamespaceName, {
     'istio-injection': 'enabled',
     testType: 'chaos',

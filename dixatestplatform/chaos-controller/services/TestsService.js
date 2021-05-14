@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 const k8s = require('@kubernetes/client-node')
 const { v4: uuidv4 } = require('uuid')
-const { K8sDeployer } = require('@vyrwu/ts-api')
+const { K8sDeployer, ChaosController } = require('@vyrwu/ts-api')
 const InMemoryDao = require('./dao');
 const Service = require('./Service');
 const logger = require('../logger');
+
 const RunsService = require('./RunsService')
+const RunStatus = ChaosController.RunStatusEnum
 
 const testsDao = InMemoryDao()
 
@@ -148,7 +150,7 @@ const runTest = ({ id, mode }) => new Promise(
       const newRun = await RunsService.addRun({
         run: {
           testId,
-          status: 'scheduled',
+          status: RunStatus.Scheduled,
           mode,
         },
       })
@@ -161,7 +163,7 @@ const runTest = ({ id, mode }) => new Promise(
         apiVersion: 'batch/v1',
         kind: 'Job',
         metadata: {
-          name: `chaos-run-${runId.slice(0, 6)}`, // a bit more predictable yet still random id
+          name: `chaos-run-${runId.slice(runId.length - 6, runId.length)}`, // a bit more predictable yet still random id
           labels: {
             runId,
             testId,
@@ -181,7 +183,7 @@ const runTest = ({ id, mode }) => new Promise(
                   name: 'worker',
                   image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
                   command: ['node', 'dist/index.js'],
-                  args: [`${mode}`, `${upstreamService}`, `${downstreamService}`, `${spec}`],
+                  args: [`${mode}`, `${upstreamService}`, `${downstreamService}`],
                 },
               ],
               restartPolicy: 'Never',
