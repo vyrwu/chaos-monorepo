@@ -88,7 +88,7 @@ const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstream
   return result
 }
 
-const addFailureToService = async (service, upstreamNamespace, chaosNamespace, faultSpec) => {
+const addFailureToService = async (service, upstreamNamespace, faultSpec, chaosNamespace) => {
   const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
   const vServiceSpec = read(`${k8sYamls}/${service}/virtual-service.yaml`)
   const routeIndex = vServiceSpec.spec.http
@@ -96,16 +96,13 @@ const addFailureToService = async (service, upstreamNamespace, chaosNamespace, f
   if (routeIndex === -1) {
     throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${vServiceSpec.metadata.name}'` }
   }
-  vServiceSpec.metadata.namespace = chaosNamespace
+  vServiceSpec.metadata.namespace = chaosNamespace || upstreamNamespace
   vServiceSpec.spec.http[routeIndex] = {
     ...vServiceSpec.spec.http[routeIndex],
     ...faultSpec,
   }
-  const apply = shell.exec(`echo "${yaml.dump(vServiceSpec)}" | kubectl apply -f -`)
-  if (apply.code !== 0) {
-    throw { message: `'kubectl apply -f ...' exitted with '${apply.code}': ${apply.stderr}`, code: 500 }
-  }
-  return vServiceSpec
+  const applyResult = applySpec(vServiceSpec)
+  return applyResult
 }
 
 module.exports = {

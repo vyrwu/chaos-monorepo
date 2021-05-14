@@ -65,13 +65,18 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
   async (resolve, reject) => {
     try {
       const { mode, runId } = chaosRun
-      if (mode !== 'canary') {
+      if (!['canary', 'production'].includes(mode)) {
         throw { message: `Unsupported deployment mode '${mode}'`, code: 400 }
       }
       // get the Run by ID => testId
       const runsAPi = new ChaosController.RunsApi()
       const runResponse = await runsAPi.getRun(runId)
-      const { testId } = runResponse.data
+      const { testId, mode: runMode } = runResponse.data
+
+      if (mode !== runMode) {
+        throw { message: `Deploy mode must match Run mode. Requested mode '${mode}', but found on Run: '${runMode}'`, code: 400 }
+      }
+
       // get Test by ID => upstream, downstream, spec
       const testApi = new ChaosController.TestsApi()
       const testResponse = await testApi.getTest(testId)
@@ -80,30 +85,54 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
       // const { upstreamService, downstreamService, spec } = test
       const { upstreamService, downstreamService, spec } = testResponse.data
 
-      // create chaos canary
-      const { namespace } = await deployChaosCanaryCluster(runId)
-      const productionNamespace = 'production'
-      const chaosNamespace = namespace.body.metadata.name
-      await addFailureToService(
-        downstreamService,
-        productionNamespace,
-        chaosNamespace,
-        spec,
-      )
-      await addChaosCanaryRouting(
-        upstreamService,
-        productionNamespace,
-        chaosNamespace,
-      )
+      const makeChaosTestDeployment = (testMode) => {
+        const modes = {
+          canary: async (productionNamespace) => {
+            // create chaos canary
+            const { namespace } = await deployChaosCanaryCluster(runId)
+            const chaosNamespace = namespace.body.metadata.name
+            await addFailureToService(
+              downstreamService,
+              productionNamespace,
+              spec,
+              chaosNamespace,
+            )
+            await addChaosCanaryRouting(
+              upstreamService,
+              productionNamespace,
+              chaosNamespace,
+            )
+            await runsAPi.patchRun(
+              runId,
+              { status: ChaosController.RunStatusEnum.Running },
+            )
+            return {
+              namespace: chaosNamespace,
+            }
+          },
+          production: async (productionNamespace) => {
+            await addFailureToService(
+              downstreamService,
+              productionNamespace,
+              spec,
+            )
+            return {
+              namespace: productionNamespace,
+            }
+          },
+        }
+        if (!Object.keys(modes).includes(testMode)) {
+          throw { message: `Unsupported deployment mode '${testMode}'`, code: 500 }
+        }
+        return modes[testMode]
+      }
 
-      const updateRunStatusRes = await runsAPi.patchRun(
-        runId,
-        { status: ChaosController.RunStatusEnum.Running },
-      )
+      const { namespace } = await makeChaosTestDeployment(mode)('production')
+
       resolve(Service.successResponse(JSON.stringify({
         result: 'Chaos Test has started!',
         runId,
-        namespace: mode === 'canary' ? chaosNamespace : productionNamespace,
+        namespace,
       }, null, 2)));
     } catch (e) {
       console.log(e)

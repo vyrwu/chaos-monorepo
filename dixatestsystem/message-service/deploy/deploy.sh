@@ -37,4 +37,4 @@ fi
 buildAndDeploy "message-service" "${npm_token}"
 
 # kick the deployment to re-pull image
-kubectl patch deployment message-service -n default -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
+kubectl patch deployment message-service -n production -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"

@@ -9,6 +9,6 @@ services=(
 for i in "${services[@]}"
 do
     cd "${i}/deploy"
-    kubectl apply -n default -f kube/
+    ./deploy.sh "${NPM_TOKEN}"
     cd ../..
 done

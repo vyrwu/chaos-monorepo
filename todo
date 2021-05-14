@@ -1,12 +1,10 @@
-- Make HTTP PUT method on chaos-controller to edit test status DONE
-- Report status of Chaos Tests to chaos-controller DONE
-- Implement chaos-worker in canary modes
-- Add support for 'production' mode
+- Run test in 'production' mode
+- Implement chaos-worker in 'production' mode to watch over Prometheus metric for upstream service (query: sum(irate(istio_requests_total{reporter="destination",destination_service=~"conversation-service.production.svc.cluster.local",response_code!~"5.*"}[1m])) / sum(irate(istio_requests_total{reporter="destination",destination_service=~"conversation-service.production.svc.cluster.local"}[1m])))
+- GOAL YES YES YES I DID IT I HAVE ONE END-TO-END Test
+- Implement 'canary-split' mode and adjust chaos worker accordingly
+- Add log progress in Runs
 - Fix high vulnerabilities
-- Add support for 'canary-mirror' and 'canary-split' modes
-- Consider giving developers few more knobs to turn
-- Revise test spec to accept additional modes: canary-mirror/canary-split/production-split
-- Update Run log when creating resources etc. 
+- * Consider giving developers few more knobs to turn
 - * Prep demo
 - * Implement cleanup for chaos Tests
 - * Refactor

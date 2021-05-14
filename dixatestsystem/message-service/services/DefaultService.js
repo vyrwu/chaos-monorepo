@@ -47,8 +47,8 @@ const deleteMessage = ({ id }) => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
@@ -67,8 +67,8 @@ const getMessage = ({ id }) => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
@@ -85,8 +85,8 @@ const getMessages = () => new Promise(
       }));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Internal Server Error',
+        e.status || 500,
       ));
     }
   },
