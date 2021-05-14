@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid')
 const InMemoryDao = require('./dao');
 const Service = require('./Service');
 const logger = require('../logger');
+const { log } = require('../logger');
 
 const runsDao = InMemoryDao()
 
@@ -115,10 +116,42 @@ const patchRun = ({ id, run }) => new Promise(
       logger.info('updateRun: {}')
       const patchResult = runsDao.patchItem(id, run)
       if (patchResult === runsDao.Responses.notFound) {
-        throw { message: `Patch '${id}' not found.`, code: 404 }
+        throw { message: `Run '${id}' not found.`, code: 404 }
       }
       resolve(Service.successResponse({
         ...runsDao.readItemById(id),
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Internal Server Error',
+        e.status || 500,
+      ));
+    }
+  },
+)
+
+const appendLog = ({ id, logEntry }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      const run = runsDao.readItemById(id)
+      if (run === runsDao.Responses.notFound) {
+        throw { message: `Run '${id}' not found.`, code: 404 }
+      }
+      const patchedRun = {
+        ...run,
+        logs: [
+          ...(run.logs || []),
+          {
+            ...logEntry,
+            timestamp: Date.now(),
+          },
+        ],
+      }
+      if (runsDao.patchItem(id, patchedRun) !== runsDao.Responses.ok) {
+        throw { message: `Failed adding logs to Run '${id}'.`, code: 500 }
+      }
+      resolve(Service.successResponse({
+        ...patchedRun,
       }));
     } catch (e) {
       reject(Service.rejectResponse(
@@ -135,4 +168,5 @@ module.exports = {
   getRun,
   getRuns,
   patchRun,
+  appendLog,
 };

@@ -12,6 +12,10 @@ const addRun = async (request, response) => {
   await Controller.handleRequest(request, response, service.addRun);
 };
 
+const appendLog = async (request, response) => {
+  await Controller.handleRequest(request, response, service.appendLog);
+};
+
 const deleteRun = async (request, response) => {
   await Controller.handleRequest(request, response, service.deleteRun);
 };
@@ -31,6 +35,7 @@ const patchRun = async (request, response) => {
 
 module.exports = {
   addRun,
+  appendLog,
   deleteRun,
   getRun,
   getRuns,

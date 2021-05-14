@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: prometheus
+  namespace: production
+spec:
+  type: ExternalName
+  externalName: prometheus.istio-system.svc.cluster.local
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9090

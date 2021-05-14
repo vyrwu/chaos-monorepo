@@ -235,6 +235,32 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Run"
+  /run/{id}/log:
+    post:
+      tags:
+        - runs
+      summary: Append log entry to Run
+      operationId: appendLog
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of a Run
+          example: "e0064a57-b327-4f77-82d7-8042911613e8"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid inputs
+      requestBody:
+        description: Append log entry to Run
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LogEntry"
 components:
   schemas:
     Test:
@@ -290,11 +316,16 @@ components:
             - scheduled
             - running
             - stopped
+            - crashed
             - completed
         created_at:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z"
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
         results:
           type: object
           properties:
@@ -308,7 +339,7 @@ components:
                   name:
                     type: string
                     example: conversation-service
-                  logs:
+                  logDump:
                     type: string
             downstreamService:
                 type: object
@@ -316,7 +347,7 @@ components:
                   name:
                     type: string
                     example: conversation-service
-                  logs:
+                  logDump:
                     type: string
         mode:
           enum:
@@ -326,3 +357,15 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Run"
+    LogEntry:
+      type: object
+      properties:
+        severity: 
+          type: string
+          enum:
+            - INFO
+            - FATAL
+        message:
+          type: string
+        timestamp:
+          type: string

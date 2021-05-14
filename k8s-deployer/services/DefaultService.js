@@ -81,8 +81,6 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
       const testApi = new ChaosController.TestsApi()
       const testResponse = await testApi.getTest(testId)
 
-      // const test = JSON.parse('{"displayName": "test", "upstreamService": "conversation-service", "downstreamService": "message-service", "spec": {"fault": {"abort": {"percentage": {"value": 100}, "httpStatus": 500}}}}')
-      // const { upstreamService, downstreamService, spec } = test
       const { upstreamService, downstreamService, spec } = testResponse.data
 
       const makeChaosTestDeployment = (testMode) => {
@@ -101,10 +99,6 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
               upstreamService,
               productionNamespace,
               chaosNamespace,
-            )
-            await runsAPi.patchRun(
-              runId,
-              { status: ChaosController.RunStatusEnum.Running },
             )
             return {
               namespace: chaosNamespace,
@@ -128,6 +122,11 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
       }
 
       const { namespace } = await makeChaosTestDeployment(mode)('production')
+
+      await runsAPi.patchRun(
+        runId,
+        { status: ChaosController.RunStatusEnum.Running },
+      )
 
       resolve(Service.successResponse(JSON.stringify({
         result: 'Chaos Test has started!',

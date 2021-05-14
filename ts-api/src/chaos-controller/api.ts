@@ -135,6 +135,41 @@ export interface IstioNetworkingV1alpha3Percent {
 /**
  * 
  * @export
+ * @interface LogEntry
+ */
+export interface LogEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof LogEntry
+     */
+    severity?: LogEntrySeverityEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof LogEntry
+     */
+    message?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LogEntry
+     */
+    timestamp?: string;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum LogEntrySeverityEnum {
+    Info = 'INFO',
+    Fatal = 'FATAL'
+}
+
+/**
+ * 
+ * @export
  * @interface Run
  */
 export interface Run {
@@ -164,6 +199,12 @@ export interface Run {
     created_at?: string;
     /**
      * 
+     * @type {Array<LogEntry>}
+     * @memberof Run
+     */
+    logs?: Array<LogEntry>;
+    /**
+     * 
      * @type {RunResults}
      * @memberof Run
      */
@@ -184,6 +225,7 @@ export enum RunStatusEnum {
     Scheduled = 'scheduled',
     Running = 'running',
     Stopped = 'stopped',
+    Crashed = 'crashed',
     Completed = 'completed'
 }
 /**
@@ -247,7 +289,7 @@ export interface RunResultsUpstreamService {
      * @type {string}
      * @memberof RunResultsUpstreamService
      */
-    logs?: string;
+    logDump?: string;
 }
 /**
  * 
@@ -348,6 +390,46 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(run, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Append log entry to Run
+         * @param {string} id ID of a Run
+         * @param {LogEntry} logEntry Append log entry to Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        appendLog: async (id: string, logEntry: LogEntry, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('appendLog', 'id', id)
+            // verify required parameter 'logEntry' is not null or undefined
+            assertParamExists('appendLog', 'logEntry', logEntry)
+            const localVarPath = `/run/{id}/log`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(logEntry, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -515,6 +597,18 @@ export const RunsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Append log entry to Run
+         * @param {string} id ID of a Run
+         * @param {LogEntry} logEntry Append log entry to Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async appendLog(id: string, logEntry: LogEntry, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.appendLog(id, logEntry, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Delete Run
          * @param {string} id ID of a Run
          * @param {*} [options] Override http request option.
@@ -579,6 +673,17 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @summary Append log entry to Run
+         * @param {string} id ID of a Run
+         * @param {LogEntry} logEntry Append log entry to Run
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        appendLog(id: string, logEntry: LogEntry, options?: any): AxiosPromise<void> {
+            return localVarFp.appendLog(id, logEntry, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Delete Run
          * @param {string} id ID of a Run
          * @param {*} [options] Override http request option.
@@ -637,6 +742,19 @@ export class RunsApi extends BaseAPI {
      */
     public addRun(run: Run, options?: any) {
         return RunsApiFp(this.configuration).addRun(run, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Append log entry to Run
+     * @param {string} id ID of a Run
+     * @param {LogEntry} logEntry Append log entry to Run
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RunsApi
+     */
+    public appendLog(id: string, logEntry: LogEntry, options?: any) {
+        return RunsApiFp(this.configuration).appendLog(id, logEntry, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
