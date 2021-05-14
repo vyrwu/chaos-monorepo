@@ -50,6 +50,31 @@ export enum ChaosRunModeEnum {
     Production = 'production'
 }
 
+/**
+ * 
+ * @export
+ * @interface InlineResponse200
+ */
+export interface InlineResponse200 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200
+     */
+    result?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200
+     */
+    runId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200
+     */
+    namespace?: string;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -60,11 +85,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Deploy a Chaos Test per its specification.
-         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {ChaosRun} chaosRun Specification for the Chaos Test to be deployed
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployChaosTest: async (chaosRun?: ChaosRun, options: any = {}): Promise<RequestArgs> => {
+        deployChaosTest: async (chaosRun: ChaosRun, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chaosRun' is not null or undefined
+            assertParamExists('deployChaosTest', 'chaosRun', chaosRun)
             const localVarPath = `/deploy/chaosTest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -134,11 +161,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Deploy a Chaos Test per its specification.
-         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {ChaosRun} chaosRun Specification for the Chaos Test to be deployed
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deployChaosTest(chaosRun?: ChaosRun, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deployChaosTest(chaosRun: ChaosRun, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InlineResponse200>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deployChaosTest(chaosRun, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -165,11 +192,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Deploy a Chaos Test per its specification.
-         * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+         * @param {ChaosRun} chaosRun Specification for the Chaos Test to be deployed
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployChaosTest(chaosRun?: ChaosRun, options?: any): AxiosPromise<void> {
+        deployChaosTest(chaosRun: ChaosRun, options?: any): AxiosPromise<InlineResponse200> {
             return localVarFp.deployChaosTest(chaosRun, options).then((request) => request(axios, basePath));
         },
         /**
@@ -194,12 +221,12 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Deploy a Chaos Test per its specification.
-     * @param {ChaosRun} [chaosRun] Specification for the Chaos Test to be deployed
+     * @param {ChaosRun} chaosRun Specification for the Chaos Test to be deployed
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deployChaosTest(chaosRun?: ChaosRun, options?: any) {
+    public deployChaosTest(chaosRun: ChaosRun, options?: any) {
         return DefaultApiFp(this.configuration).deployChaosTest(chaosRun, options).then((request) => request(this.axios, this.basePath));
     }
 

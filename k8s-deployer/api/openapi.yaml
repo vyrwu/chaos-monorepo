@@ -25,8 +25,13 @@ paths:
             schema:
               $ref: '#/components/schemas/ChaosRun'
         description: Specification for the Chaos Test to be deployed
+        required: true
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
           description: Successful operation
         "404":
           description: Test not found
@@ -48,3 +53,16 @@ components:
           - canary
           - production
           type: string
+    inline_response_200:
+      example:
+        result: result
+        namespace: namespace
+        runId: runId
+      properties:
+        result:
+          type: string
+        runId:
+          type: string
+        namespace:
+          type: string
+      type: object

@@ -1,0 +1,32 @@
+curl -X POST http://chaos-controller/chaos/test -H 'Content-Type: application/json' -d '{"displayName": "test", "upstreamService": "conversation-service", "downstreamService": "message-service", "spec": {"fault": {"abort": {"percentage": {"value": "100"}, "httpStatus": "500"}}}}'
+curl -X POST http://chaos-controller/chaos/test/e01abb2e-70cb-4f83-aad7-77f44c9abb9d/run/production
+curl http://chaos-controller/chaos/runs
+curl -X POST localhost:8080/deploy/chaosTest -H 'Content-Type: application/json' -d '{"mode": "production", "runId": "5bc4d134-7594-4681-95b8-1459c51105c7"}'
+
+
+const test = JSON.parse('{"displayName": "test", "upstreamService": "conversation-service", "downstreamService": "message-service", "spec": {"fault": {"abort": {"percentage": {"value": 100}, "httpStatus": 500}}}}')
+const { upstreamService, downstreamService, spec } = test
+
+
+{"fault": {"abort": {"percentage": {"value": "10"}, "httpStatus": "500"}}}
+    # fault:
+    #   delay:
+    #     percentage:
+    #       value: 0.1
+    #     fixedDelay: 2s
+    #   abort:
+    #     percentage:
+    #       value: 0.1
+    #     httpStatus: 500
+
+kctl delete ns chaos-test-1f412f                              
+kctl delete ns chaos-test-1f412f5d-7f1d-44d5-8ef9-1e2f1a137b58
+kctl delete ns chaos-test-1f712f                              
+kctl delete ns chaos-test-1f812f                              
+kctl delete ns chaos-test-1f812f5d-7f1d-44d5-8ef9-1e2f1a137b56
+kctl delete ns chaos-test-ad6388
+
+id=$(curl localhost:8080/chaos/run -d '{}' -H 'Content-Type: application/json' | jq -r '.id')
+curl localhost:8080/chaos/run/${id}/log -H 'Content-Type: application/json' -d '{"severity": "FATAL", "message": "I dropped the sandwitch wet side down"}'
+curl localhost:8080/chaos/run/${id}/log -H 'Content-Type: application/json' -d '{"severity": "FATAL", "message": "I dropped the sandwitch wet side down"}'
+curl localhost:8080/chaos/run/${id}/log -H 'Content-Type: application/json' -d '{"severity": "FATAL", "message": "I dropped the sandwitch wet side down"}'

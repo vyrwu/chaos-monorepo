@@ -21,7 +21,8 @@ paths:
       summary: Deploy a Chaos Test per its specification.
       operationId: deployChaosTest
       requestBody:
-        description: Specification for the Chaos Test to be deployed 
+        description: Specification for the Chaos Test to be deployed
+        required: true
         content:
           application/json:
               schema:
@@ -29,6 +30,17 @@ paths:
       responses:
         "200":
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                  runId:
+                    type: string
+                  namespace:
+                    type: string
         "404":
           description: Test not found
 components:
