@@ -301,6 +301,12 @@ components:
         description: description
         id: e0064a57-b327-4f77-82d7-8042911613e8
         upstreamService: conversation-service
+        successCriterion:
+          service: service
+          comparisonOperator: '>'
+          name: name
+          threshold: 1.4658129805029452
+          type: latency
         spec:
           fault:
             delay:
@@ -337,6 +343,8 @@ components:
           type: string
         spec:
           $ref: '#/components/schemas/Test_spec'
+        successCriterion:
+          $ref: '#/components/schemas/Test_successCriterion'
     Tests:
       items:
         $ref: '#/components/schemas/Test'
@@ -531,6 +539,36 @@ components:
       properties:
         fault:
           $ref: '#/components/schemas/istio.networking.v1alpha3.HTTPFaultInjection'
+      type: object
+    Test_successCriterion:
+      description: Acceptance criterion for PASSing the test.
+      example:
+        service: service
+        comparisonOperator: '>'
+        name: name
+        threshold: 1.4658129805029452
+        type: latency
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - latency
+          - traffic
+          - errors
+          - saturation
+          - availability
+          type: string
+        service:
+          type: string
+        comparisonOperator:
+          enum:
+          - '>'
+          - <
+          - =
+          type: string
+        threshold:
+          type: number
       type: object
     Run_results_upstreamService:
       example:

@@ -7,4 +7,3 @@ RUN npm install
 RUN rm -f .npmrc
 COPY . .
 EXPOSE 8080
-CMD [ "node", "index.js" ]

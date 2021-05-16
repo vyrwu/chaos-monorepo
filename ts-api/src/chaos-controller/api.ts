@@ -339,6 +339,12 @@ export interface Test {
      * @memberof Test
      */
     spec?: TestSpec;
+    /**
+     * 
+     * @type {TestSuccessCriterion}
+     * @memberof Test
+     */
+    successCriterion?: TestSuccessCriterion;
 }
 /**
  * Chaos Test specification, defining perturbations to be injected into the system.
@@ -353,6 +359,65 @@ export interface TestSpec {
      */
     fault?: IstioNetworkingV1alpha3HTTPFaultInjection;
 }
+/**
+ * Acceptance criterion for PASSing the test.
+ * @export
+ * @interface TestSuccessCriterion
+ */
+export interface TestSuccessCriterion {
+    /**
+     * 
+     * @type {string}
+     * @memberof TestSuccessCriterion
+     */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestSuccessCriterion
+     */
+    type?: TestSuccessCriterionTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestSuccessCriterion
+     */
+    service?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestSuccessCriterion
+     */
+    comparisonOperator?: TestSuccessCriterionComparisonOperatorEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof TestSuccessCriterion
+     */
+    threshold?: number;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum TestSuccessCriterionTypeEnum {
+    Latency = 'latency',
+    Traffic = 'traffic',
+    Errors = 'errors',
+    Saturation = 'saturation',
+    Availability = 'availability'
+}
+/**
+    * @export
+    * @enum {string}
+    */
+export enum TestSuccessCriterionComparisonOperatorEnum {
+    GreaterThan = '>',
+    LessThan = '<',
+    Equal = '='
+}
+
 
 /**
  * RunsApi - axios parameter creator

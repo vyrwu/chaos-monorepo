@@ -1,13 +1,20 @@
 X Run test in 'production' mode 
+X Add log progress in Runs
+X Implement chaos-worker in 'production' mode to watch over Prometheus metric for upstream service
 
-GET prometheus:9090/api/v1/query?query=(urlencodedquery)
+- Execute first end-to-end test in 'production' mode
 
-- Implement chaos-worker in 'production' mode to watch over Prometheus metric for upstream service (query: sum(irate(istio_requests_total{reporter="destination",destination_service=~"conversation-service.production.svc.cluster.local",response_code!~"5.*"}[1m])) / sum(irate(istio_requests_total{reporter="destination",destination_service=~"conversation-service.production.svc.cluster.local"}[1m])))
-- GOAL YES YES YES I DID IT I HAVE ONE END-TO-END Test
-- Implement 'canary-split' mode and adjust chaos worker accordingly
-- Add log progress in Runs
 - Fix high vulnerabilities
+- Implement 'canary-split' mode and adjust chaos worker accordingly
 - * Consider giving developers few more knobs to turn
 - * Prep demo
 - * Implement cleanup for chaos Tests
 - * Refactor
+
+
+# NICE TO HAVE
+# UI for adding Chaos Tests
+# UI for seeing test results
+# Microservice test result visualisation map
+
+

@@ -295,6 +295,30 @@ components:
               type: object
               description: Istio standard HTTPFaultInjection definition for specifying the types of perturbations to be injected. 
               $ref: "./openapi-istio.json#/components/schemas/istio.networking.v1alpha3.HTTPFaultInjection"
+        successCriterion:
+          type: object
+          description: Acceptance criterion for PASSing the test.
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+              enum:
+                - latency
+                - traffic
+                - errors
+                - saturation
+                - availability
+            service:
+              type: string
+            comparisonOperator:
+              type: string
+              enum: 
+                - '>'
+                - '<'
+                - '='
+            threshold:
+              type: number
     Tests:
       type: array
       items:

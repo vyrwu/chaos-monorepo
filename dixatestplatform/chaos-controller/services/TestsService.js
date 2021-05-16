@@ -145,7 +145,7 @@ const runTest = ({ id, mode }) => new Promise(
         id: testId,
         upstreamService,
         downstreamService,
-        spec,
+        successCriterion,
       } = test.payload
       const newRun = await RunsService.addRun({
         run: {
@@ -183,7 +183,13 @@ const runTest = ({ id, mode }) => new Promise(
                   name: 'worker',
                   image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
                   command: ['node', 'dist/index.js'],
-                  args: [`${mode}`, `${upstreamService}`, `${downstreamService}`],
+                  args: [
+                    `${runId}`,
+                    `${mode}`,
+                    `${upstreamService}`,
+                    `${downstreamService}`,
+                    `${JSON.stringify(successCriterion)}`,
+                  ],
                 },
               ],
               restartPolicy: 'Never',
