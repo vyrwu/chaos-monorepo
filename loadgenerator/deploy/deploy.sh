@@ -37,4 +37,4 @@ fi
 buildAndDeploy "loadgenerator" "${npm_token}"
 
 # kick the deployment to re-pull image
-kubectl patch deployment loadgenerator -n default -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
+kubectl patch deployment loadgenerator -n production -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"

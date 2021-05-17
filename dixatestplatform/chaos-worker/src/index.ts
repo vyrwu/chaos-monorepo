@@ -1,13 +1,50 @@
 import { ChaosController, K8sDeployer } from '@vyrwu/ts-api'
 import axios from 'axios'
 
+const log = async (
+  runId: string,
+  logEntry: { severity: ChaosController.LogEntrySeverityEnum, message: string }) => {
+  const runsApi = new ChaosController.RunsApi()
+  console.log(logEntry)
+  await runsApi.appendLog(runId, logEntry)
+}
+
 (async () => {
-  const [runId, mode, upstreamService, downstreamsService, successCriterionString] = process.argv.slice(2)
+  // Validate script argument
+  const [$1, $2, $3, $4, $5] = process.argv.slice(2)
+  
+  const args: {[key: string]: string} = {
+    runId: $1,
+    mode: $2,
+    upstreamService: $3,
+    downstreamsService: $4,
+    successCriterionString: $5
+  }
+
+  console.log(`Input args: ${JSON.stringify(process.argv, null, 2)}`)
+
+  Object.keys(args).forEach((key: string) => {
+    if (!args[key]) {
+      throw new Error(`Missing argument: ${key}`)
+    }
+  })
+
+  const {
+    runId,
+    mode,
+    upstreamService,
+    downstreamsService,
+    successCriterionString,
+  } = args
+
   const successCriterion: ChaosController.TestSuccessCriterion = JSON.parse(successCriterionString)
   const isDev = process.env['isDev']
   const runsApi = new ChaosController.RunsApi()
   const deployerApi = new K8sDeployer.DefaultApi()
-
+  await log(runId, {
+    severity: ChaosController.LogEntrySeverityEnum.Info,
+    message: `Chaos Test Worker started!`
+  }) 
   const isTestRunningBackoff = async (runId: string, timeout: number, retries: number) => {
     let count = retries
     const poolStatus = async (): Promise<boolean> => {
@@ -38,30 +75,32 @@ import axios from 'axios'
       runId,
       mode: mode === Canary ? Canary : Production,
     })
-    await runsApi.appendLog(runId, {
-      severity: ChaosController.LogEntrySeverityEnum.Info,
-      message: `${JSON.stringify(chaosDeployResult)}`
-    })
-    // // Wait until Test started, linear backoff
+
+    await runsApi.patchRun(
+      runId,
+      { status: ChaosController.RunStatusEnum.Running },
+    )
+
     const isTestRunning = await isTestRunningBackoff(runId, 25, 5)
     if (!isTestRunning) {
       throw new Error(`Timeout waiting for a run '${runId}' to start.`)
     }
     const compare = (comparisonOperator: string) => {
-      const {Equal, LessThan, GreaterThan} = ChaosController.TestSuccessCriterionComparisonOperatorEnum
-      const comparisons = {
-        [`${Equal}`]: (a: number, b: number) => a === b,
-        [`${GreaterThan}`]: (a: number, b: number) => a > b,
-        [`${LessThan}`]: (a: number, b: number) => a < b,
+      const { GreaterThan, LessThan, Equal } = ChaosController.TestSuccessCriterionComparisonOperatorEnum
+      const comparisons: {[key: string]: (a: number, b: number) => boolean} = {
+        [Equal]: (a: number, b: number) => a === b,
+        [GreaterThan]: (a: number, b: number) => a > b,
+        [LessThan]: (a: number, b: number) => a < b,
       }
-      if (Object.keys(comparisons).includes(comparisonOperator)) {
-        throw new Error(`Unsupported comparison operator '${comparisonOperator}'. Supported: ${JSON.stringify(ChaosController.TestSuccessCriterionComparisonOperatorEnum, null, 2)}`)
+      if (!Object.keys(comparisons).includes(comparisonOperator)) {
+        throw new Error(`Unsupported comparison operator '${comparisonOperator}'.`)
       }
       return comparisons[comparisonOperator]
     }
     const { comparisonOperator, service, threshold } = successCriterion
 
-    await runsApi.appendLog(runId, {
+    // console.log("Pooling for the test run status to be 'successful'...")
+    await log(runId, {
         severity: ChaosController.LogEntrySeverityEnum.Info,
         message: `Starting Chaos Test Evaluation (Success Criterion: ${JSON.stringify(successCriterion)})`
     })
@@ -69,17 +108,23 @@ import axios from 'axios'
     for (let i = 0; i < 5; i++) {
       await delay(5)
       const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
-      const [_, serverSuccessRate] = queryResponse.data.result[0].value // value between 0 and 1
-      const isTestSuccessful = compare(comparisonOperator as string)(threshold as number, serverSuccessRate)
+      const serverSuccessRate = queryResponse.data.result[0].value // value between 0 and 1
+      console.log({
+        serverSuccessRate: {
+          value: serverSuccessRate,
+          type: `${typeof serverSuccessRate}`
+        }
+      })
+      const isTestSuccessful = compare(comparisonOperator as string)(threshold as number, parseFloat(serverSuccessRate))
       if (!isTestSuccessful) {
-        await runsApi.appendLog(runId, {
+        await log(runId, {
           severity: ChaosController.LogEntrySeverityEnum.Info,
           message: `FAIL: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
         })
         testStatus = ChaosController.RunResultsStatusEnum.Fail
         return
       }
-      await runsApi.appendLog(runId, {
+      await log(runId, {
         severity: ChaosController.LogEntrySeverityEnum.Info,
         message: `OK: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
       })
@@ -99,17 +144,15 @@ import axios from 'axios'
       }
     })
   } catch (err) {
-    console.log(err)
-    Promise.all([
+    // console.log(err)
+    await Promise.all([
       runsApi.patchRun(runId, { status: ChaosController.RunStatusEnum.Crashed }),
       deployerApi.redeployAll(),
-      await runsApi.appendLog(runId, {
+      log(runId, {
         severity: ChaosController.LogEntrySeverityEnum.Fatal,
-        message: `CHAOS WORKER ERROR: ${JSON.stringify(err)}`
+        message: `CHAOS WORKER ERROR: ${err}`
       })
-    ]).catch(e => {
-      console.log(e)
-    })
+    ])
     process.exit(1)
   }
 })();

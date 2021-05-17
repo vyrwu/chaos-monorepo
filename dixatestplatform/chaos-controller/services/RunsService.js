@@ -113,7 +113,7 @@ const getRuns = () => new Promise(
 const patchRun = ({ id, run }) => new Promise(
   async (resolve, reject) => {
     try {
-      logger.info('updateRun: {}')
+      logger.info(`patchRun: ${{ id, run }}`)
       const patchResult = runsDao.patchItem(id, run)
       if (patchResult === runsDao.Responses.notFound) {
         throw { message: `Run '${id}' not found.`, code: 404 }

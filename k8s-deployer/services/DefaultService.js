@@ -123,10 +123,12 @@ const deployChaosTest = ({ chaosRun }) => new Promise(
 
       const { namespace } = await makeChaosTestDeployment(mode)('production')
 
-      await runsAPi.patchRun(
+      const pathRunResponse = await runsAPi.patchRun(
         runId,
         { status: ChaosController.RunStatusEnum.Running },
       )
+
+      console.log(pathRunResponse)
 
       resolve(Service.successResponse(JSON.stringify({
         result: 'Chaos Test has started!',
