@@ -182,6 +182,7 @@ const runTest = ({ id, mode }) => new Promise(
                 {
                   name: 'worker',
                   image: '654015427134.dkr.ecr.eu-west-1.amazonaws.com/chaos-secalekdev-chaos-worker:latest',
+                  imagePullPolicy: 'Always',
                   command: ['node', 'dist/index.js'],
                   args: [
                     `${runId}`,
@@ -197,7 +198,12 @@ const runTest = ({ id, mode }) => new Promise(
           },
         },
       })
-      resolve(Service.successResponse(`Chaos Test scheduled in '${mode}' mode. Check Job ID: '${result.response.body.metadata.name}'\n`));
+      resolve(Service.successResponse({
+        result: 'Chaos Test successfully scheduled.',
+        runId,
+        mode,
+        jobId: result.response.body.metadata.name,
+      }))
     } catch (e) {
       console.log(e)
       reject(Service.rejectResponse(
