@@ -1,0 +1,104 @@
+.App {
+  display: flex;
+  height: 100vh;
+  padding: var(--spacing-m);
+}
+
+#nav {
+  width: 20vw;
+  height: 100%;
+  display: block;
+}
+
+#page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  place-content: center;
+  padding: var(--spacing-s);
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - var(--spacing-m));
+  margin-top: calc(-3 * var(--spacing-m));
+  place-content: center;
+  place-items: center;
+  padding: var(--spacing-s);
+}
+
+.navButton:active {
+  background-color: var(--second-accent);
+  color: white;
+}
+
+.ctaButton {
+  background-color: var(--main-accent);
+  padding: var(--spacing-s) calc(2 * var(--spacing-s));
+  color: black;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+#tests {
+  margin-top: var(--spacing-s);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+}
+
+.navButton {
+  color: var(--second-accent);
+  padding: var(--spacing-s);
+  border: 1px solid var(--second-accent);
+  text-align: center;
+  width: 16rem;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+#logo {
+  width: 6.6rem;
+  height: 3.4rem;
+
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

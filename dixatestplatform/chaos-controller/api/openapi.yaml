@@ -7,7 +7,8 @@ info:
   title: Dixa Testing Platform - OpenAPI 3.0
   version: 0.0.1
 servers:
-- url: http://chaos-controller/chaos
+# - url: http://chaos-controller/chaos
+- url: http://localhost:8080
 tags:
 - description: Definitions for test scenarios.
   name: tests

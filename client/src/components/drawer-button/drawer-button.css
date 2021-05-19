@@ -1,0 +1,21 @@
+#container {
+    padding: var(--spacing-s);
+    background-color: var(--main-bg);
+    margin-bottom: var(--spacing-s);
+}
+
+#name {
+    font-size: 130%;
+    height: 3rem;
+    font-weight: 500;
+    display: flex;
+    place-content: center;
+    place-items: center;
+    text-align: left;
+}
+
+.open {
+    height: 30rem;
+    width: 100%;
+    background-color: var(--main-bg);
+}
