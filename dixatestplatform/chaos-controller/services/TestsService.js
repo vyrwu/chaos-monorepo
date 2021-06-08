@@ -195,6 +195,7 @@ const runTest = ({ id, mode }) => new Promise(
               ],
               restartPolicy: 'Never',
             },
+            backoffLimit: 0,
           },
         },
       })

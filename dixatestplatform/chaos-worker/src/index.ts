@@ -104,31 +104,35 @@ const log = async (
         severity: ChaosController.LogEntrySeverityEnum.Info,
         message: `Starting Chaos Test Evaluation (Success Criterion: ${JSON.stringify(successCriterion)})`
     })
-    let testStatus: ChaosController.RunResultsStatusEnum = ChaosController.RunResultsStatusEnum.Pass;
-    for (let i = 0; i < 5; i++) {
-      await delay(5)
-      const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
-      const serverSuccessRate = queryResponse.data.result[0].value // value between 0 and 1
-      console.log({
-        serverSuccessRate: {
-          value: serverSuccessRate,
-          type: `${typeof serverSuccessRate}`
+
+    const observeTest = async (): Promise<ChaosController.RunResultsStatusEnum> => {
+      for (let i = 0; i < 5; i++) {
+        await delay(5)
+        const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
+        const serverSuccessRate = queryResponse.data.result[1].value // value between 0 and 1
+        console.log({
+          serverSuccessRate: {
+            value: serverSuccessRate,
+            type: `${typeof serverSuccessRate}`
+          }
+        })
+        const isTestSuccessful = compare(comparisonOperator as string)(threshold as number, parseFloat(serverSuccessRate))
+        if (!isTestSuccessful) {
+          await log(runId, {
+            severity: ChaosController.LogEntrySeverityEnum.Info,
+            message: `FAIL: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
+          })
+          return ChaosController.RunResultsStatusEnum.Fail 
         }
-      })
-      const isTestSuccessful = compare(comparisonOperator as string)(threshold as number, parseFloat(serverSuccessRate))
-      if (!isTestSuccessful) {
         await log(runId, {
           severity: ChaosController.LogEntrySeverityEnum.Info,
-          message: `FAIL: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
+          message: `OK: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
         })
-        testStatus = ChaosController.RunResultsStatusEnum.Fail
-        return
       }
-      await log(runId, {
-        severity: ChaosController.LogEntrySeverityEnum.Info,
-        message: `OK: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
-      })
+      return ChaosController.RunResultsStatusEnum.Pass
     }
+    const testStatus: ChaosController.RunResultsStatusEnum = await observeTest()
+    
     await runsApi.patchRun(runId, {
       status: ChaosController.RunStatusEnum.Completed,
       results: {
