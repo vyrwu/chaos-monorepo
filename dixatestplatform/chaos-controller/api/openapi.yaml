@@ -8,6 +8,7 @@ info:
   version: 0.0.1
 servers:
 - url: http://chaos-controller/chaos
+- url: http://localhost:8080/chaos
 tags:
 - description: Definitions for test scenarios.
   name: tests

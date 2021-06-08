@@ -1,11 +1,14 @@
-X Run test in 'production' mode 
-X Add log progress in Runs
-X Implement chaos-worker in 'production' mode to watch over Prometheus metric for upstream service
+Goal: Have "staging" environment. On that environment, perform two automated chaos experiments - one in canary mode, the other in direct ("production"). 
 
-- Execute first end-to-end test in 'production' mode
+X have example run via local
+X Execute first end-to-end test in 'production' mode
 
+- Fix chaos workers (right now, they just hang forever).
+- Implement 'canary-mirror' mode and adjust chaos worker accordingly
 - Fix high vulnerabilities
-- Implement 'canary-split' mode and adjust chaos worker accordingly
+- Come up with more test scenarios
+- Rename 'production' mode to 'primary'
+
 - * Consider giving developers few more knobs to turn
 - * Prep demo
 - * Implement cleanup for chaos Tests
