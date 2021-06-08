@@ -7,7 +7,6 @@ const ConversationServiceAPI = (() => {
     return {
         addConversation: async (payload: Conversation) => {
             const response = await ConversationServiceClient.addConversation(payload);
-            console.log('Result: ', response.status)
             return response
         }
     }
@@ -23,7 +22,11 @@ const probeConversations = () => {
     }
 
     console.log('ConversationServiceAPI.addConversation')
-    ConversationServiceAPI.addConversation(payload).catch(err => { console.log('Result: ', err.code || err.response.status) })
+    Promise.resolve(ConversationServiceAPI.addConversation(payload)).then(resp => {
+        console.log('OK: ', resp.status)
+    }).catch(err => {
+        console.log('ERROR: ', err.code || err.response.status)
+    })
 }
 
 const interval = 2000

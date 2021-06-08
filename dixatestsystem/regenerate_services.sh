@@ -6,9 +6,6 @@ generate_service () {
    SERVER_GENERATOR='nodejs-express-server'
    CLIENT_GENERATOR='typescript-axios'
 
-   rm -rf "backup/${DIR_NAME}"
-   cp -r "${DIR_NAME}" "backup/${DIR_NAME}"
-
    java -jar ${GENERATOR_JAR} generate \
       -i ${DIR_NAME}/openapi.yaml \
       -g ${SERVER_GENERATOR} \
@@ -40,11 +37,11 @@ echo ""
 echo "UPDATING CLIENT PACKAGE"
 echo ""
 
-cd "ts-api"
+cd "../ts-api"
 npm version minor > /dev/null
 npm i
 npm publish
-cd ..
+cd ../dixatestsystem
 
 services_to_update=( 
    "conversation-service"
