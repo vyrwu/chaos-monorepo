@@ -3,7 +3,11 @@ import axios from 'axios'
 
 const log = async (
   runId: string,
-  logEntry: { severity: ChaosController.LogEntrySeverityEnum, message: string }) => {
+    logEntry: {
+      severity: ChaosController.LogEntrySeverityEnum,
+      message: string
+  }
+) => {
   const runsApi = new ChaosController.RunsApi()
   console.log(logEntry)
   await runsApi.appendLog(runId, logEntry)
@@ -66,7 +70,10 @@ const log = async (
     return new Promise( resolve => setTimeout(resolve, s*1000) );
   }
 
-  const getPrometheusQuery = (service: string, namespace: string): string => encodeURI(`sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local",response_code!~"5.*"}[1m])) / sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local"}[1m]))`)
+  const getPrometheusQuery = (
+    service: string,
+    namespace: string
+  ): string => encodeURI(`sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local",response_code!~"5.*"}[1m])) / sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local"}[1m]))`)
 
   try {
     // Start the test actually
@@ -109,14 +116,15 @@ const log = async (
       for (let i = 0; i < 5; i++) {
         await delay(5)
         const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
-        const serverSuccessRate = queryResponse.data.result[1].value // value between 0 and 1
+        const serverSuccessRate = queryResponse.data.result[0].value[1] // value between 0 and 1
         console.log({
           serverSuccessRate: {
             value: serverSuccessRate,
             type: `${typeof serverSuccessRate}`
-          }
+          },
+          data: queryResponse.data
         })
-        const isTestSuccessful = compare(comparisonOperator as string)(threshold as number, parseFloat(serverSuccessRate))
+        const isTestSuccessful = compare(comparisonOperator as string)(parseFloat(serverSuccessRate), threshold as number)
         if (!isTestSuccessful) {
           await log(runId, {
             severity: ChaosController.LogEntrySeverityEnum.Info,

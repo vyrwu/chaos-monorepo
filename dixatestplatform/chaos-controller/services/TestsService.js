@@ -195,8 +195,8 @@ const runTest = ({ id, mode }) => new Promise(
               ],
               restartPolicy: 'Never',
             },
-            backoffLimit: 0,
           },
+          backoffLimit: 0,
         },
       })
       resolve(Service.successResponse({
