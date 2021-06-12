@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ChaosController } = require('@vyrwu/ts-api')
+const k8s = require('@kubernetes/client-node')
 const { read, applySpec, createK8sNamespace } = require('./util')
 
 const patchYaml = (kind, chaosNamespaceName) => {
@@ -62,8 +63,19 @@ const addCanaryTrafficMirror = async ({
   downstreamNamespace,
   mirrorPercentageValue,
 }) => {
-  const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
-  const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  // const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
+  // const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  const kc = new k8s.KubeConfig()
+  kc.loadFromDefault()
+  const customObjApi = kc.makeApiClient(k8s.CustomObjectsApi)
+  const vsResponse = await customObjApi.getNamespacedCustomObject(
+    'networking.istio.io',
+    'v1alpha3',
+    upstreamNamespace,
+    'virtualservices',
+    serviceName,
+  )
+  const upstreamVirtualServiceSpec = vsResponse.body
   const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
   upstreamVirtualServiceSpec.spec.hosts = [
@@ -98,8 +110,19 @@ const addCanaryTrafficSplit = async ({
   downstreamNamespace,
   splitPercentageValue,
 }) => {
-  const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
-  const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  // const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
+  // const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  const kc = new k8s.KubeConfig()
+  kc.loadFromDefault()
+  const customObjApi = kc.makeApiClient(k8s.CustomObjectsApi)
+  const vsResponse = await customObjApi.getNamespacedCustomObject(
+    'networking.istio.io',
+    'v1alpha3',
+    upstreamNamespace,
+    'virtualservices',
+    serviceName,
+  )
+  const upstreamVirtualServiceSpec = vsResponse.body
   const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
   upstreamVirtualServiceSpec.spec.hosts = [
