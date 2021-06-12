@@ -46,6 +46,26 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Test"
+            example:
+              displayName: message-degraded-service
+              upstreamService: conversation-service
+              downstreamService: message-service
+              spec:
+                fault:
+                  abort:
+                    percentage:
+                      value: '10'
+                    httpStatus: '500'
+                  delay:
+                    percentage:
+                      value: 50
+                    fixedDelay: '2s'
+              successCriterion:
+                name: SLO
+                type: availability
+                service: conversation-service
+                comparisonOperator: ">"
+                threshold: '0.7'
   /test/{id}:
     get:
       tags:
@@ -273,14 +293,6 @@ components:
   schemas:
     Test:
       properties:
-        id:
-          type: string
-          format: uuid
-          example: "e0064a57-b327-4f77-82d7-8042911613e8"
-        created_at:
-          type: string
-          format: date-time
-          example: "2017-07-21T17:32:28Z"
         displayName:
           type: string
           example: long-timeout

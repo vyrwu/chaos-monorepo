@@ -1,10 +1,16 @@
 Goal: Have "staging" environment. On that environment, perform two automated chaos experiments - one in canary mode, the other in direct ("production"). 
 
 X have example run via local
-X Execute first end-to-end test in 'production' mode
+X Execute first end-to-end test in 'productio n' mode
 
-- Fix chaos workers (right now, they just hang forever).
-- Implement 'canary-mirror' mode and adjust chaos worker accordingly
+x Fix chaos workers (right now, they just hang forever).
+X Implement 'canary-mirror' mode and adjust chaos worker accordingly
+X Execute test in 'canary-mirror' mode
+x Implement traffic splitting for canary
+- Execute test in 'canary-split' mode
+- Figure out the right metric to use for canary "successCriterion", or disable successCriterion for canary tests
+- Support test timeout
+- Run same test in multiple modes?
 - Fix high vulnerabilities
 - Come up with more test scenarios
 - Rename 'production' mode to 'primary'

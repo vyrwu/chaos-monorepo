@@ -337,18 +337,6 @@ export interface Test {
      * @type {string}
      * @memberof Test
      */
-    id?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Test
-     */
-    created_at?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Test
-     */
     displayName?: string;
     /**
      * Description of a tests scenario.

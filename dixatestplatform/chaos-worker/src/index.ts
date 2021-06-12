@@ -112,7 +112,7 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
         }
 
         const queryResponse = await getDownsteamServiceMetric()
-        const serverSuccessRate = queryResponse.data.result[0].value[1] // value between 0 and 1
+        const serverSuccessRate = queryResponse.value[1] // value between 0 and 1
         console.log({
           serverSuccessRate: {
             value: serverSuccessRate,

@@ -35,6 +35,26 @@ paths:
       requestBody:
         content:
           application/json:
+            example:
+              displayName: message-degraded-service
+              upstreamService: conversation-service
+              downstreamService: message-service
+              spec:
+                fault:
+                  abort:
+                    percentage:
+                      value: "10"
+                    httpStatus: "500"
+                  delay:
+                    percentage:
+                      value: 50
+                    fixedDelay: 2s
+              successCriterion:
+                name: SLO
+                type: availability
+                service: conversation-service
+                comparisonOperator: '>'
+                threshold: "0.7"
             schema:
               $ref: '#/components/schemas/Test'
         description: Create a new Test
@@ -305,9 +325,7 @@ components:
       example:
         displayName: long-timeout
         downstreamService: message-service
-        created_at: 2017-07-21T17:32:28Z
         description: description
-        id: e0064a57-b327-4f77-82d7-8042911613e8
         upstreamService: conversation-service
         successCriterion:
           service: service
@@ -325,14 +343,6 @@ components:
               percentage:
                 value: 6.027456183070403
       properties:
-        id:
-          example: e0064a57-b327-4f77-82d7-8042911613e8
-          format: uuid
-          type: string
-        created_at:
-          example: 2017-07-21T17:32:28Z
-          format: date-time
-          type: string
         displayName:
           example: long-timeout
           type: string
