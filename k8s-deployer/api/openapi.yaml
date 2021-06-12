@@ -7,6 +7,7 @@ info:
   version: 0.0.1
 servers:
 - url: http://k8s-deployer
+- url: http://localhost:8080
 paths:
   /redeployAll:
     get:
@@ -41,18 +42,43 @@ components:
   schemas:
     ChaosRun:
       example:
-        mode: canary
+        routingSpec:
+          routingType: split
+          weight: 0.8008281904610115
         runId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         runId:
           format: uuid
           type: string
         mode:
-          description: Mode of the deployment to be made
+          $ref: '#/components/schemas/DeploymentMode'
+        routingSpec:
+          $ref: '#/components/schemas/RoutingSpec'
+    DeploymentMode:
+      description: Mode of the deployment to be made
+      enum:
+      - canary
+      - production
+      type: string
+    RoutingSpec:
+      example:
+        routingType: split
+        weight: 0.8008281904610115
+      properties:
+        routingType:
+          description: The way in which traffic is meant to be routed to the canary
+            environment. Split - migrates portion of traffic from primary environment
+            to canary. Mirror - mirrors portion of the traffic from the primary to
+            canary environment.
           enum:
-          - canary
-          - production
+          - split
+          - mirror
           type: string
+        weight:
+          description: The percentage of total traffic to be routed to the canary
+            environment.
+          type: number
+      type: object
     inline_response_200:
       example:
         result: result

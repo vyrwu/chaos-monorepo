@@ -1,6 +1,7 @@
 openapi: 3.0.2
 servers:
   - url: http://k8s-deployer
+  - url: http://localhost:8080
 info:
   description: |-
     Service for deploying services onto Kubernetes.
@@ -51,8 +52,24 @@ components:
           type: string
           format: uuid
         mode:
+          $ref: "#/components/schemas/DeploymentMode"
+        routingSpec:
+          $ref: "#/components/schemas/RoutingSpec"
+    DeploymentMode:
+      type: string
+      description: Mode of the deployment to be made
+      enum:
+          - canary
+          - production
+    RoutingSpec:
+      type: object
+      properties:
+        routingType:
           type: string
-          description: Mode of the deployment to be made
+          description: The way in which traffic is meant to be routed to the canary environment. Split - migrates portion of traffic from primary environment to canary. Mirror - mirrors portion of the traffic from the primary to canary environment.
           enum:
-              - canary
-              - production
+            - split
+            - mirror
+        weight:
+          description: The percentage of total traffic to be routed to the canary environment.
+          type: number

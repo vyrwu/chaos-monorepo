@@ -3,6 +3,18 @@ const shell = require('shelljs')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const { promisify } = require('util')
+const { ChaosController } = require('@vyrwu/ts-api')
+
+const validateChaosTestInputs = (mode, routingSpec) => {
+  const { Canary, Production } = ChaosController.RunModeEnum
+  if (![Canary, Production].includes(mode)) {
+    return { message: `Unsupported mode '${mode}'`, code: 400 }
+  }
+  if (routingSpec && mode !== Canary) {
+    return { message: `RoutingSpec is not supported for '${mode}' mode.`, code: 400 }
+  }
+  return null
+}
 
 const applySpec = async (spec) => {
   const apply = shell.exec(`echo "${yaml.dump(spec)}" | kubectl apply -f -`)
@@ -68,5 +80,9 @@ async function createK8sNamespace(name, labels) {
 }
 
 module.exports = {
-  applyFile, read, applySpec, createK8sNamespace,
+  applyFile,
+  read,
+  applySpec,
+  createK8sNamespace,
+  validateChaosTestInputs,
 }

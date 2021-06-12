@@ -1,7 +1,6 @@
-const shell = require('shelljs')
 const fs = require('fs')
 const path = require('path')
-const yaml = require('js-yaml')
+const { ChaosController } = require('@vyrwu/ts-api')
 const { read, applySpec, createK8sNamespace } = require('./util')
 
 const patchYaml = (kind, chaosNamespaceName) => {
@@ -57,10 +56,15 @@ const deployChaosCanaryCluster = async (runId) => {
   return { namespace: namespaceResult, cluster: clusterResult }
 }
 
-const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstreamNamespace) => {
+const addCanaryTrafficMirror = async ({
+  serviceName,
+  upstreamNamespace,
+  downstreamNamespace,
+  mirrorPercentageValue,
+}) => {
   const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
-  const upstreamVirtualServiceSpec = read(`${k8sYamls}/${upstreamName}/virtual-service.yaml`)
-  const chaosCanaryServicefqdn = `${upstreamName}.${downstreamNamespace}.svc.cluster.local`
+  const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
   upstreamVirtualServiceSpec.spec.hosts = [
     ...upstreamVirtualServiceSpec.spec.hosts,
@@ -76,12 +80,52 @@ const addChaosCanaryRouting = async (upstreamName, upstreamNamespace, downstream
       host: chaosCanaryServicefqdn,
     },
     mirrorPercentage: {
-      value: 20,
+      value: mirrorPercentageValue,
     },
   }
   upstreamVirtualServiceSpec.spec.http[routeIndex] = {
     ...upstreamVirtualServiceSpec.spec.http[routeIndex],
     ...routingConf,
+  }
+
+  const result = await applySpec(upstreamVirtualServiceSpec)
+  return result
+}
+
+const addCanaryTrafficSplit = async ({
+  serviceName,
+  upstreamNamespace,
+  downstreamNamespace,
+  splitPercentageValue,
+}) => {
+  const k8sYamls = `${path.resolve(path.dirname(__filename), '..')}/k8sYamls`
+  const upstreamVirtualServiceSpec = read(`${k8sYamls}/${serviceName}/virtual-service.yaml`)
+  const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
+  upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
+  upstreamVirtualServiceSpec.spec.hosts = [
+    ...upstreamVirtualServiceSpec.spec.hosts,
+    chaosCanaryServicefqdn,
+  ]
+  const routeIndex = upstreamVirtualServiceSpec.spec.http
+    .findIndex(route => route.name === 'production')
+  if (routeIndex === -1) {
+    throw { message: `No route found for env '${upstreamNamespace}' in Virtual Service '${upstreamVirtualServiceSpec.metadata.name}'` }
+  }
+  const currentHTTPRoute = upstreamVirtualServiceSpec.spec.http[routeIndex]
+  const prodRoute = currentHTTPRoute.route[0]
+  const newProdWeight = prodRoute.weight - splitPercentageValue
+  prodRoute.weight = newProdWeight
+  upstreamVirtualServiceSpec.spec.http[routeIndex] = {
+    ...currentHTTPRoute,
+    route: [
+      prodRoute,
+      {
+        destination: {
+          host: chaosCanaryServicefqdn,
+        },
+        weight: splitPercentageValue,
+      },
+    ],
   }
 
   const result = await applySpec(upstreamVirtualServiceSpec)
@@ -105,8 +149,69 @@ const addFailureToService = async (service, upstreamNamespace, faultSpec, chaosN
   return applyResult
 }
 
+const makeChaosTestDeployment = ({
+  testMode,
+  runId,
+  productionNamespace,
+  upstreamService,
+  downstreamService,
+}) => {
+  const modes = {
+    canary: async ({ failureSpec, routingSpec }) => {
+      // create chaos canary
+      const { namespace } = await deployChaosCanaryCluster(runId)
+      const chaosNamespace = namespace.body.metadata.name
+      await addFailureToService(
+        downstreamService,
+        productionNamespace,
+        failureSpec,
+        chaosNamespace,
+      )
+      // TODO more error-handing here
+      const { Mirror, Split } = ChaosController.RoutingSpecRoutingTypeEnum
+      const { routingType, weight } = routingSpec
+      if (routingType === Mirror) {
+        console.log(`Applying '${routingType}' routing...`)
+        await addCanaryTrafficMirror({
+          serviceName: upstreamService,
+          upstreamNamespace: productionNamespace,
+          downstreamNamespace: chaosNamespace,
+          mirrorPercentageValue: weight,
+        })
+      } else if (routingType === Split) {
+        console.log(`Applying '${routingType}' routing...`)
+        await addCanaryTrafficSplit({
+          serviceName: upstreamService,
+          upstreamNamespace: productionNamespace,
+          downstreamNamespace: chaosNamespace,
+          splitPercentageValue: weight,
+        })
+      }
+      return {
+        namespace: chaosNamespace,
+      }
+    },
+    production: async ({ failureSpec }) => {
+      await addFailureToService(
+        downstreamService,
+        productionNamespace,
+        failureSpec,
+      )
+      return {
+        namespace: productionNamespace,
+      }
+    },
+  }
+  if (!Object.keys(modes).includes(testMode)) {
+    throw { message: `Unsupported deployment mode '${testMode}'`, code: 400 }
+  }
+  return modes[testMode]
+}
+
 module.exports = {
   deployChaosCanaryCluster,
-  addChaosCanaryRouting,
   addFailureToService,
+  addCanaryTrafficMirror,
+  addCanaryTrafficSplit,
+  makeChaosTestDeployment,
 }
