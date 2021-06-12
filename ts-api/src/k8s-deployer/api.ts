@@ -34,18 +34,24 @@ export interface ChaosRun {
      */
     runId?: string;
     /**
-     * Mode of the deployment to be made
-     * @type {string}
+     * 
+     * @type {DeploymentMode}
      * @memberof ChaosRun
      */
-    mode?: ChaosRunModeEnum;
+    mode?: DeploymentMode;
+    /**
+     * 
+     * @type {RoutingSpec}
+     * @memberof ChaosRun
+     */
+    routingSpec?: RoutingSpec;
 }
-
 /**
-    * @export
-    * @enum {string}
-    */
-export enum ChaosRunModeEnum {
+ * Mode of the deployment to be made
+ * @export
+ * @enum {string}
+ */
+export enum DeploymentMode {
     Canary = 'canary',
     Production = 'production'
 }
@@ -75,6 +81,35 @@ export interface InlineResponse200 {
      */
     namespace?: string;
 }
+/**
+ * 
+ * @export
+ * @interface RoutingSpec
+ */
+export interface RoutingSpec {
+    /**
+     * The way in which traffic is meant to be routed to the canary environment. Split - migrates portion of traffic from primary environment to canary. Mirror - mirrors portion of the traffic from the primary to canary environment.
+     * @type {string}
+     * @memberof RoutingSpec
+     */
+    routingType?: RoutingSpecRoutingTypeEnum;
+    /**
+     * The percentage of total traffic to be routed to the canary environment.
+     * @type {number}
+     * @memberof RoutingSpec
+     */
+    weight?: number;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RoutingSpecRoutingTypeEnum {
+    Split = 'split',
+    Mirror = 'mirror'
+}
+
 
 /**
  * DefaultApi - axios parameter creator

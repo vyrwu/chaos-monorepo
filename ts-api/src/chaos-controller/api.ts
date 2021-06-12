@@ -170,6 +170,35 @@ export enum LogEntrySeverityEnum {
 /**
  * 
  * @export
+ * @interface RoutingSpec
+ */
+export interface RoutingSpec {
+    /**
+     * The way in which traffic is meant to be routed to the canary environment. Split - migrates portion of traffic from primary environment to canary. Mirror - mirrors portion of the traffic from the primary to canary environment.
+     * @type {string}
+     * @memberof RoutingSpec
+     */
+    routingType?: RoutingSpecRoutingTypeEnum;
+    /**
+     * The percentage of total traffic to be routed to the canary environment.
+     * @type {number}
+     * @memberof RoutingSpec
+     */
+    weight?: number;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RoutingSpecRoutingTypeEnum {
+    Split = 'split',
+    Mirror = 'mirror'
+}
+
+/**
+ * 
+ * @export
  * @interface Run
  */
 export interface Run {
@@ -196,6 +225,18 @@ export interface Run {
      * @type {string}
      * @memberof Run
      */
+    mode?: RunModeEnum;
+    /**
+     * 
+     * @type {RoutingSpec}
+     * @memberof Run
+     */
+    routingSpec?: RoutingSpec;
+    /**
+     * 
+     * @type {string}
+     * @memberof Run
+     */
     created_at?: string;
     /**
      * 
@@ -209,12 +250,6 @@ export interface Run {
      * @memberof Run
      */
     results?: RunResults;
-    /**
-     * 
-     * @type {string}
-     * @memberof Run
-     */
-    mode?: RunModeEnum;
 }
 
 /**
@@ -233,8 +268,8 @@ export enum RunStatusEnum {
     * @enum {string}
     */
 export enum RunModeEnum {
-    Canary = 'canary',
-    Production = 'production'
+    Production = 'production',
+    Canary = 'canary'
 }
 
 /**
@@ -1017,10 +1052,11 @@ export const TestsApiAxiosParamCreator = function (configuration?: Configuration
          * @summary Execute test scenarios.
          * @param {string} id ID of the test to execute
          * @param {'canary' | 'production'} mode 
+         * @param {RoutingSpec} [routingSpec] Traffic routing specificiation for the canary ingress traffic.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTest: async (id: string, mode: 'canary' | 'production', options: any = {}): Promise<RequestArgs> => {
+        runTest: async (id: string, mode: 'canary' | 'production', routingSpec?: RoutingSpec, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('runTest', 'id', id)
             // verify required parameter 'mode' is not null or undefined
@@ -1041,9 +1077,12 @@ export const TestsApiAxiosParamCreator = function (configuration?: Configuration
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(routingSpec, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1142,11 +1181,12 @@ export const TestsApiFp = function(configuration?: Configuration) {
          * @summary Execute test scenarios.
          * @param {string} id ID of the test to execute
          * @param {'canary' | 'production'} mode 
+         * @param {RoutingSpec} [routingSpec] Traffic routing specificiation for the canary ingress traffic.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async runTest(id: string, mode: 'canary' | 'production', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.runTest(id, mode, options);
+        async runTest(id: string, mode: 'canary' | 'production', routingSpec?: RoutingSpec, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTest(id, mode, routingSpec, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1214,11 +1254,12 @@ export const TestsApiFactory = function (configuration?: Configuration, basePath
          * @summary Execute test scenarios.
          * @param {string} id ID of the test to execute
          * @param {'canary' | 'production'} mode 
+         * @param {RoutingSpec} [routingSpec] Traffic routing specificiation for the canary ingress traffic.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTest(id: string, mode: 'canary' | 'production', options?: any): AxiosPromise<void> {
-            return localVarFp.runTest(id, mode, options).then((request) => request(axios, basePath));
+        runTest(id: string, mode: 'canary' | 'production', routingSpec?: RoutingSpec, options?: any): AxiosPromise<void> {
+            return localVarFp.runTest(id, mode, routingSpec, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1292,12 +1333,13 @@ export class TestsApi extends BaseAPI {
      * @summary Execute test scenarios.
      * @param {string} id ID of the test to execute
      * @param {'canary' | 'production'} mode 
+     * @param {RoutingSpec} [routingSpec] Traffic routing specificiation for the canary ingress traffic.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TestsApi
      */
-    public runTest(id: string, mode: 'canary' | 'production', options?: any) {
-        return TestsApiFp(this.configuration).runTest(id, mode, options).then((request) => request(this.axios, this.basePath));
+    public runTest(id: string, mode: 'canary' | 'production', routingSpec?: RoutingSpec, options?: any) {
+        return TestsApiFp(this.configuration).runTest(id, mode, routingSpec, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

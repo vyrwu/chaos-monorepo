@@ -1,31 +1,21 @@
 import { ChaosController, K8sDeployer } from '@vyrwu/ts-api'
 import axios from 'axios'
-
-const log = async (
-  runId: string,
-    logEntry: {
-      severity: ChaosController.LogEntrySeverityEnum,
-      message: string
-  }
-) => {
-  const runsApi = new ChaosController.RunsApi()
-  console.log(logEntry)
-  await runsApi.appendLog(runId, logEntry)
-}
+import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
 
 (async () => {
   // Validate script argument
-  const [$1, $2, $3, $4, $5] = process.argv.slice(2)
+  const [$1, $2, $3, $4, $5, $6] = process.argv.slice(2)
   
   const args: {[key: string]: string} = {
     runId: $1,
     mode: $2,
     upstreamService: $3,
     downstreamsService: $4,
-    successCriterionString: $5
+    successCriterionString: $5,
+    routingSpecString: $6,
   }
 
-  console.log(`Input args: ${JSON.stringify(process.argv, null, 2)}`)
+  // console.log(`Input args: ${JSON.stringify(process.argv, null, 2)}`)
 
   Object.keys(args).forEach((key: string) => {
     if (!args[key]) {
@@ -39,56 +29,42 @@ const log = async (
     upstreamService,
     downstreamsService,
     successCriterionString,
+    routingSpecString,
   } = args
 
   const successCriterion: ChaosController.TestSuccessCriterion = JSON.parse(successCriterionString)
+  const routingSpec: ChaosController.RoutingSpec = JSON.parse(routingSpecString)
+
   const isDev = process.env['isDev']
   const runsApi = new ChaosController.RunsApi()
   const deployerApi = new K8sDeployer.DefaultApi()
   await log(runId, {
     severity: ChaosController.LogEntrySeverityEnum.Info,
     message: `Chaos Test Worker started!`
-  }) 
-  const isTestRunningBackoff = async (runId: string, timeout: number, retries: number) => {
-    let count = retries
-    const poolStatus = async (): Promise<boolean> => {
-      const { data } = await runsApi.getRun(runId)
-      if (data.status === ChaosController.RunStatusEnum.Running) {
-        return true
-      }
-      await delay(timeout / count)
-      count--
-      if (count !== 0) {
-        return await poolStatus()
-      }
-      return false
-    }
-    return await poolStatus()
-  }
-  
-  const delay = (s: number) => {
-    return new Promise( resolve => setTimeout(resolve, s*1000) );
-  }
-
-  const getPrometheusQuery = (
-    service: string,
-    namespace: string
-  ): string => encodeURI(`sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local",response_code!~"5.*"}[1m])) / sum(irate(istio_requests_total{reporter="destination",destination_service=~"${service}.${namespace}.svc.cluster.local"}[1m]))`)
+  })
 
   try {
     // Start the test actually
-    const { Canary, Production } = K8sDeployer.ChaosRunModeEnum
     const chaosDeployResult = await deployerApi.deployChaosTest({
       runId,
-      mode: mode === Canary ? Canary : Production,
+      mode: mode as K8sDeployer.DeploymentMode,
+      routingSpec,
     })
 
-    await runsApi.patchRun(
-      runId,
-      { status: ChaosController.RunStatusEnum.Running },
-    )
+    console.log(chaosDeployResult.data)
 
-    const isTestRunning = await isTestRunningBackoff(runId, 25, 5)
+    // Verify that the test is running (k8s0deployer sets status to Running once it finished the deploy)
+    const isTestRunning = await isPredicateTrueBackoff(
+      async () => {
+        const { data } = await runsApi.getRun(runId)
+        if (data.status === ChaosController.RunStatusEnum.Running) {
+          return true
+        }
+        return false
+      },
+      25,
+      5
+    )
     if (!isTestRunning) {
       throw new Error(`Timeout waiting for a run '${runId}' to start.`)
     }
@@ -115,14 +91,33 @@ const log = async (
     const observeTest = async (): Promise<ChaosController.RunResultsStatusEnum> => {
       for (let i = 0; i < 5; i++) {
         await delay(5)
-        const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
+        const getDownsteamServiceMetric = async () => {
+          const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
+          console.log(queryResponse)
+          return queryResponse.data.result[0] // value between 0 and 1
+        }
+        const isMetricAvailable = await isPredicateTrueBackoff(
+          async () => {
+            const metricData = await getDownsteamServiceMetric()
+            if (!metricData) {
+              return false
+            }
+            return true
+          },
+          120,
+          5
+        )
+        if (!isMetricAvailable) {
+          throw new Error(`Timeout waiting for metrics to be available. Prometheus Query: '${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}'.`)
+        }
+
+        const queryResponse = await getDownsteamServiceMetric()
         const serverSuccessRate = queryResponse.data.result[0].value[1] // value between 0 and 1
         console.log({
           serverSuccessRate: {
             value: serverSuccessRate,
             type: `${typeof serverSuccessRate}`
           },
-          data: queryResponse.data
         })
         const isTestSuccessful = compare(comparisonOperator as string)(parseFloat(serverSuccessRate), threshold as number)
         if (!isTestSuccessful) {
@@ -139,6 +134,7 @@ const log = async (
       }
       return ChaosController.RunResultsStatusEnum.Pass
     }
+    // TODO Observe only if success criterion exists.
     const testStatus: ChaosController.RunResultsStatusEnum = await observeTest()
     
     await runsApi.patchRun(runId, {

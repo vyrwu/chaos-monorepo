@@ -5,14 +5,12 @@ const { K8sDeployer, ChaosController } = require('@vyrwu/ts-api')
 const InMemoryDao = require('./dao');
 const Service = require('./Service');
 const logger = require('../logger');
-
+const { validateChaosTestInputs } = require('./util')
 const RunsService = require('./RunsService')
+
 const RunStatus = ChaosController.RunStatusEnum
-
 const testsDao = InMemoryDao()
-
 const k8sDeployerApi = new K8sDeployer.DefaultApi()
-
 let kc
 try {
   kc = new k8s.KubeConfig()
@@ -133,9 +131,16 @@ const getTests = () => new Promise(
 * mode String
 * no response value expected for this operation
 * */
-const runTest = ({ id, mode }) => new Promise(
+const runTest = ({ id, mode, routingSpec }) => new Promise(
   async (resolve, reject) => {
     try {
+      // Validate inputs
+      const validationError = validateChaosTestInputs(mode, routingSpec)
+      if (validationError) {
+        throw validationError
+      }
+
+      // Verify test exists
       logger.info('runTest', { id, mode })
       const test = await getTest({ id })
       if (test.code !== 200) {
@@ -147,11 +152,14 @@ const runTest = ({ id, mode }) => new Promise(
         downstreamService,
         successCriterion,
       } = test.payload
+
+      // Start test
       const newRun = await RunsService.addRun({
         run: {
           testId,
           status: RunStatus.Scheduled,
           mode,
+          routingSpec,
         },
       })
       if (newRun.code !== 200) {
@@ -190,6 +198,7 @@ const runTest = ({ id, mode }) => new Promise(
                     `${upstreamService}`,
                     `${downstreamService}`,
                     `${JSON.stringify(successCriterion)}`,
+                    `${JSON.stringify(routingSpec)}`,
                   ],
                 },
               ],
@@ -203,6 +212,7 @@ const runTest = ({ id, mode }) => new Promise(
         result: 'Chaos Test successfully scheduled.',
         runId,
         mode,
+        routingSpec,
         jobId: result.response.body.metadata.name,
       }))
     } catch (e) {

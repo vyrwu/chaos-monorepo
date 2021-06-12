@@ -119,6 +119,13 @@ paths:
           - production
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutingSpec'
+        description: Traffic routing specificiation for the canary ingress traffic.
+        required: false
       responses:
         "200":
           description: Test has started successfuly
@@ -352,7 +359,10 @@ components:
       type: array
     Run:
       example:
-        mode: canary
+        mode: production
+        routingSpec:
+          routingType: split
+          weight: 0.8008281904610115
         created_at: 2017-07-21T17:32:28Z
         testId: e0064a57-b327-4f77-82d7-8042911613e8
         id: e0064a57-b327-4f77-82d7-8042911613e8
@@ -390,6 +400,13 @@ components:
           - crashed
           - completed
           type: string
+        mode:
+          enum:
+          - production
+          - canary
+          type: string
+        routingSpec:
+          $ref: '#/components/schemas/RoutingSpec'
         created_at:
           example: 2017-07-21T17:32:28Z
           format: date-time
@@ -400,11 +417,6 @@ components:
           type: array
         results:
           $ref: '#/components/schemas/Run_results'
-        mode:
-          enum:
-          - canary
-          - production
-          type: string
     Runs:
       items:
         $ref: '#/components/schemas/Run'
@@ -424,6 +436,25 @@ components:
           type: string
         timestamp:
           type: string
+      type: object
+    RoutingSpec:
+      example:
+        routingType: split
+        weight: 0.8008281904610115
+      properties:
+        routingType:
+          description: The way in which traffic is meant to be routed to the canary
+            environment. Split - migrates portion of traffic from primary environment
+            to canary. Mirror - mirrors portion of the traffic from the primary to
+            canary environment.
+          enum:
+          - split
+          - mirror
+          type: string
+        weight:
+          description: The percentage of total traffic to be routed to the canary
+            environment.
+          type: number
       type: object
     istio.networking.v1alpha3.HTTPFaultInjection:
       description: HTTPFaultInjection can be used to specify one or more faults to

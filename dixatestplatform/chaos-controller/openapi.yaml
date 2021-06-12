@@ -110,6 +110,13 @@ paths:
               - canary
               - production
           required: true
+      requestBody:
+        description: Traffic routing specificiation for the canary ingress traffic. 
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutingSpec"
       responses:
         "200":
           description: Test has started successfuly
@@ -343,6 +350,15 @@ components:
             - stopped
             - crashed
             - completed
+        mode:
+          type: string
+          enum: 
+            - production
+            - canary
+        routingSpec:
+          description: Traffic routing specificiation for the canary ingress traffic. 
+          type: object
+          $ref: "#/components/schemas/RoutingSpec"
         created_at:
           type: string
           format: date-time
@@ -374,10 +390,6 @@ components:
                     example: conversation-service
                   logDump:
                     type: string
-        mode:
-          enum:
-            - canary
-            - production
     Runs:
       type: array
       items:
@@ -394,3 +406,16 @@ components:
           type: string
         timestamp:
           type: string
+    RoutingSpec:
+      type: object
+      properties:
+        routingType:
+          type: string
+          description: The way in which traffic is meant to be routed to the canary environment. Split - migrates portion of traffic from primary environment to canary. Mirror - mirrors portion of the traffic from the primary to canary environment.
+          enum:
+            - split
+            - mirror
+        weight:
+          description: The percentage of total traffic to be routed to the canary environment.
+          type: number
+
