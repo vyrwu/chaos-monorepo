@@ -5,8 +5,8 @@ const validateChaosTestInputs = (mode, routingSpec) => {
   if (![Canary, Production].includes(mode)) {
     return { message: `Unsupported mode '${mode}'`, code: 400 }
   }
-  if (routingSpec && mode !== Canary) {
-    return { message: `RoutingSpec is not supported for '${mode}' mode.`, code: 400 }
+  if (mode === Canary && !routingSpec) {
+    return { message: `Missing RoutingSpec. It must be provided for '${mode}' mode.`, code: 400 }
   }
   return null
 }

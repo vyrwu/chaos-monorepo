@@ -31,7 +31,6 @@ import { isPredicateTrueBackoff, log, observeTest } from './util';
 
   const successCriterion: null | ChaosController.TestSuccessCriterion = successCriterionString === "" ? null : JSON.parse(successCriterionString)
   const routingSpec: ChaosController.RoutingSpec = JSON.parse(routingSpecString)
-
   // const isDev = process.env['isDev']
   const runsApi = new ChaosController.RunsApi()
   const deployerApi = new K8sDeployer.DefaultApi()
