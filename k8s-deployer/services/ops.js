@@ -75,6 +75,7 @@ const addCanaryTrafficMirror = async ({
     'virtualservices',
     serviceName,
   )
+  delete vsResponse.body.metadata.resourceVersion
   const upstreamVirtualServiceSpec = vsResponse.body
   const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
@@ -122,6 +123,7 @@ const addCanaryTrafficSplit = async ({
     'virtualservices',
     serviceName,
   )
+  delete vsResponse.body.metadata.resourceVersion
   const upstreamVirtualServiceSpec = vsResponse.body
   const chaosCanaryServicefqdn = `${serviceName}.${downstreamNamespace}.svc.cluster.local`
   upstreamVirtualServiceSpec.metadata.namespace = upstreamNamespace
