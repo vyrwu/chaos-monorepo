@@ -1,6 +1,5 @@
 import { ChaosController, K8sDeployer } from '@vyrwu/ts-api'
-import axios from 'axios'
-import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
+import { isPredicateTrueBackoff, log, observeTest } from './util';
 
 (async () => {
   // Validate script argument
@@ -14,8 +13,6 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
     successCriterionString: $5,
     routingSpecString: $6,
   }
-
-  // console.log(`Input args: ${JSON.stringify(process.argv, null, 2)}`)
 
   Object.keys(args).forEach((key: string) => {
     if (!args[key]) {
@@ -32,15 +29,15 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
     routingSpecString,
   } = args
 
-  const successCriterion: ChaosController.TestSuccessCriterion = JSON.parse(successCriterionString)
+  const successCriterion: null | ChaosController.TestSuccessCriterion = successCriterionString === "" ? null : JSON.parse(successCriterionString)
   const routingSpec: ChaosController.RoutingSpec = JSON.parse(routingSpecString)
 
-  const isDev = process.env['isDev']
+  // const isDev = process.env['isDev']
   const runsApi = new ChaosController.RunsApi()
   const deployerApi = new K8sDeployer.DefaultApi()
   await log(runId, {
     severity: ChaosController.LogEntrySeverityEnum.Info,
-    message: `Chaos Test Worker started!`
+    message: `Chaos worker started!`
   })
 
   try {
@@ -68,89 +65,41 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
     if (!isTestRunning) {
       throw new Error(`Timeout waiting for a run '${runId}' to start.`)
     }
-    const compare = (comparisonOperator: string) => {
-      const { GreaterThan, LessThan, Equal } = ChaosController.TestSuccessCriterionComparisonOperatorEnum
-      const comparisons: {[key: string]: (a: number, b: number) => boolean} = {
-        [Equal]: (a: number, b: number) => a === b,
-        [GreaterThan]: (a: number, b: number) => a > b,
-        [LessThan]: (a: number, b: number) => a < b,
-      }
-      if (!Object.keys(comparisons).includes(comparisonOperator)) {
-        throw new Error(`Unsupported comparison operator '${comparisonOperator}'.`)
-      }
-      return comparisons[comparisonOperator]
-    }
-    const { comparisonOperator, service, threshold } = successCriterion
 
-    // console.log("Pooling for the test run status to be 'successful'...")
+    // Check if successCriterion present
+
     await log(runId, {
+      severity: ChaosController.LogEntrySeverityEnum.Info,
+      message: `Chaos experiment started successfully! Experiment resources will NOT be cleaned-up automatically - you must do manually via the '/test/{id}/stop' endpoint.`
+    })
+
+    if (successCriterion) {
+      await log(runId, {
         severity: ChaosController.LogEntrySeverityEnum.Info,
-        message: `Starting Chaos Test Evaluation (Success Criterion: ${JSON.stringify(successCriterion)})`
-    })
+        message: `Observing chaos experiment... (Success Criterion: ${JSON.stringify(successCriterion)})`
+      })
+      // TODO Observe only if success criterion exists.
+      const testStatus: ChaosController.RunResultsStatusEnum = await observeTest(runId,
+        chaosDeployResult.data.namespace as string,
+        successCriterion)
 
-    const observeTest = async (): Promise<ChaosController.RunResultsStatusEnum> => {
-      for (let i = 0; i < 5; i++) {
-        await delay(60)
-        const getDownsteamServiceMetric = async () => {
-          const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
-          return queryResponse.data.result[0] // value between 0 and 1
-        }
-        const isMetricAvailable = await isPredicateTrueBackoff(
-          async () => {
-            const metricData = await getDownsteamServiceMetric()
-            if (!metricData) {
-              return false
-            }
-            return true
+      await runsApi.patchRun(runId, {
+        status: ChaosController.RunStatusEnum.Completed,
+        results: {
+          upstreamService: {
+            name: upstreamService,
+            logDump: '' // logs here
           },
-          120,
-          5
-        )
-        if (!isMetricAvailable) {
-          throw new Error(`Timeout waiting for metrics to be available. Prometheus Query: '${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}'.`)
-        }
-
-        const queryResponse = await getDownsteamServiceMetric()
-        const serverSuccessRate = queryResponse.value[1] // value between 0 and 1
-        console.log({
-          queryResponse: JSON.stringify(queryResponse),
-          serverSuccessRate: {
-            value: serverSuccessRate,
-            type: `${typeof serverSuccessRate}`
+          downstreamService: {
+            name: downstreamsService,
+            logDump: '' // logs here
           },
-        })
-        const isTestSuccessful = compare(comparisonOperator as string)(parseFloat(serverSuccessRate), threshold as number)
-        if (!isTestSuccessful) {
-          await log(runId, {
-            severity: ChaosController.LogEntrySeverityEnum.Info,
-            message: `FAIL: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
-          })
-          return ChaosController.RunResultsStatusEnum.Fail 
+          status: testStatus
         }
-        await log(runId, {
-          severity: ChaosController.LogEntrySeverityEnum.Info,
-          message: `OK: ${serverSuccessRate} (expected ${comparisonOperator} ${threshold}).`
-        })
-      }
-      return ChaosController.RunResultsStatusEnum.Pass
+      })
+    } else {
+      await runsApi.patchRun(runId, { status: ChaosController.RunStatusEnum.Completed })
     }
-    // TODO Observe only if success criterion exists.
-    const testStatus: ChaosController.RunResultsStatusEnum = await observeTest()
-    
-    await runsApi.patchRun(runId, {
-      status: ChaosController.RunStatusEnum.Completed,
-      results: {
-        upstreamService: {
-          name: upstreamService,
-          logDump: '' // logs here
-        },
-        downstreamService: {
-          name: downstreamsService,
-          logDump: '' // logs here
-        },
-        status: testStatus
-      }
-    })
   } catch (err) {
     // console.log(err)
     await Promise.all([
