@@ -7,17 +7,18 @@ x Fix chaos workers (right now, they just hang forever).
 X Implement 'canary-mirror' mode and adjust chaos worker accordingly
 X Execute test in 'canary-mirror' mode
 x Implement traffic splitting for canary
-- Execute test in 'canary-split' mode
-- Figure out the right metric to use for canary "successCriterion", or disable successCriterion for canary tests
-- Support test timeout
-- Run same test in multiple modes?
+X Execute test in 'canary-split' mode
+X * Consider giving developers few more knobs to turn
+X Run same test in multiple modes? Tricky. Requires to pull current VS and apply patch to it. 
+- When 'successCriterion empty', let the test run continously.
 - Fix high vulnerabilities
-- Come up with more test scenarios
 - Rename 'production' mode to 'primary'
+- Come up with more test scenarios
 
-- * Consider giving developers few more knobs to turn
+
 - * Prep demo
-- * Implement cleanup for chaos Tests
+- * Implement cleanup for individual chaos tests
+- * Support test timeout
 - * Refactor
 
 

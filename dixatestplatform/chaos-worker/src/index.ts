@@ -90,10 +90,9 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
 
     const observeTest = async (): Promise<ChaosController.RunResultsStatusEnum> => {
       for (let i = 0; i < 5; i++) {
-        await delay(5)
+        await delay(60)
         const getDownsteamServiceMetric = async () => {
           const { data: queryResponse } = await axios.get(`http://${isDev ? 'localhost' : 'prometheus'}:9090/api/v1/query?query=${getPrometheusQuery(service as string, chaosDeployResult.data.namespace as string)}`)
-          console.log(queryResponse)
           return queryResponse.data.result[0] // value between 0 and 1
         }
         const isMetricAvailable = await isPredicateTrueBackoff(
@@ -114,6 +113,7 @@ import { delay, getPrometheusQuery, isPredicateTrueBackoff, log } from './util';
         const queryResponse = await getDownsteamServiceMetric()
         const serverSuccessRate = queryResponse.value[1] // value between 0 and 1
         console.log({
+          queryResponse: JSON.stringify(queryResponse),
           serverSuccessRate: {
             value: serverSuccessRate,
             type: `${typeof serverSuccessRate}`
