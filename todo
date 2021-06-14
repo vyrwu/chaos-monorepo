@@ -11,14 +11,14 @@ X Execute test in 'canary-split' mode
 X * Consider giving developers few more knobs to turn
 X Run same test in multiple modes? Tricky. Requires to pull current VS and apply patch to it. 
 X When 'successCriterion empty', let the test run continously.
-- chaos-controller (when success criterion empty - throws error. That should not happen.)
-- Test experiment without 'successCriterion'
-- Fix high vulnerabilities
-- Rename 'production' mode to 'primary'
-- Come up with more test scenarios
+X chaos-controller (when success criterion empty - throws error. That should not happen.)
+X Test experiment without 'successCriterion'
+- Weird - tests in production mode pass all the time. Check if the metric is correct.
+- Prepare demo
 
-
-- * Prep demo
+- * Fix high vulnerabilities
+- * Rename 'production' mode to 'primary'
+- * Rename 'production' namespace to 'staging'
 - * Implement cleanup for individual chaos tests
 - * Support test timeout
 - * Refactor

@@ -29,7 +29,6 @@ import { isPredicateTrueBackoff, log, observeTest } from './util';
     routingSpecString,
   } = args
 
-  const successCriterion: null | ChaosController.TestSuccessCriterion = successCriterionString === "" ? null : JSON.parse(successCriterionString)
   const routingSpec: ChaosController.RoutingSpec = JSON.parse(routingSpecString)
   // const isDev = process.env['isDev']
   const runsApi = new ChaosController.RunsApi()
@@ -72,7 +71,8 @@ import { isPredicateTrueBackoff, log, observeTest } from './util';
       message: `Chaos experiment started successfully! Experiment resources will NOT be cleaned-up automatically - you must do manually via the '/test/{id}/stop' endpoint.`
     })
 
-    if (successCriterion) {
+    if (successCriterionString !== 'undefined') {
+      const successCriterion: ChaosController.TestSuccessCriterion = JSON.parse(successCriterionString)
       await log(runId, {
         severity: ChaosController.LogEntrySeverityEnum.Info,
         message: `Observing chaos experiment... (Success Criterion: ${JSON.stringify(successCriterion)})`
@@ -100,7 +100,7 @@ import { isPredicateTrueBackoff, log, observeTest } from './util';
       await runsApi.patchRun(runId, { status: ChaosController.RunStatusEnum.Completed })
     }
   } catch (err) {
-    // console.log(err)
+    console.log(err)
     await Promise.all([
       runsApi.patchRun(runId, { status: ChaosController.RunStatusEnum.Crashed }),
       deployerApi.redeployAll(),
