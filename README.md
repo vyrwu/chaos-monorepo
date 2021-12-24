@@ -1,5 +1,6 @@
 # chaos-monorepo
-Bucket repo for everything related to my Master Thesis. Topic: "impact of Chaos Engineering on reliability of microservices".
+Bucket repo for everything related to my Master Thesis.
+Topic: **"Impact of Chaos Engineering on reliability of microservices"**.
 
 A purpose of this implementation was to build a chaos engineering platform running on top of Istio, capable of scheduling and executing chaos engineering experiments (latency and error rate injection) via simple and easy to understand Restful APIs and UIs. The experiment executions are done in an automatically provisioned canary environment receiving mirrored or split traffic from production, or directly in the production environment. This is a fully functional MVP which can be immediately used by the microservice development teams to orchestrate their chaos experiments. The implementation can be divided into three categories:
 
